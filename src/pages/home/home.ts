@@ -93,7 +93,7 @@ export class HomePage {
 
     this.sincronizar();
     console.log('Pasando datos a memoria y sincronizando');
-    setTimeout(() => { this.elDemonio(); }, 60000);
+    setTimeout(() => { this.elDemonio(); }, 10000);
   }
 
   sincronizar() {
