@@ -23,6 +23,16 @@ export class MyApp {
     camera: PvdCameraProvider
   ) {
     platform.ready().then(() => {
+
+  //   $ionicPlatform.registerBackButtonAction(function (event) {
+  //   event.preventDefault();
+		// }, 100);
+
+
+	platform.registerBackButtonAction(function(){
+  		event.preventDefault();
+	}, 100);
+
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       sqlite.crearBase();
