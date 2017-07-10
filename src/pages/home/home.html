@@ -14,7 +14,7 @@
     <div id="invisibe" hidden="true">
         <ion-item>
             <ion-label>Id: {{uuid}}</ion-label>
-            <ion-input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave"></ion-input>
+            <ion-input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
             <button item-right id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">Desbloquear</button>
         </ion-item>
     </div>

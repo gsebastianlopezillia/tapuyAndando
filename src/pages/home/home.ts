@@ -334,6 +334,7 @@ export class HomePage {
   hideClave() {
     let divClave = document.getElementById('invisibe');
     divClave.setAttribute("hidden", "true");
+    this.clave = '';
   }
 
   desbloquear(){
