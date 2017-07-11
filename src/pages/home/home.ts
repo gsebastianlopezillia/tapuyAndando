@@ -30,6 +30,8 @@ export class HomePage {
   respuestas: any = [];
   clave: any;
 
+  accion: any;
+
   opcionesConImagen: any = [];
   opcionesSinImagen: any = [];
 
@@ -83,20 +85,22 @@ export class HomePage {
 
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
+    setTimeout(() => { this.traerEncuestaServidor(); }, 3600000);
+    this.accion+='-traerEncuestaServidor()-';
     console.log('Buscando encuesta en servidor');
     this.http.getJsonData();
     this.getEncuesta();
-    setTimeout(() => { this.traerEncuestaServidor(); }, 60 * 60 * 1000);
   }
 
   elDemonio() {
-
-    this.sincronizar();
+    this.accion+='-elDemonio()-';
     console.log('Pasando datos a memoria y sincronizando');
-    setTimeout(() => { this.elDemonio(); }, 10000);
+    setTimeout(() => { this.elDemonio(); }, 15000);
+    this.sincronizar();
   }
 
   sincronizar() {
+    this.accion+='-sincronizar()-';
     if (this.respuestas.length > 0) {
       console.log('entra al if');
       this.insertRespuesta(this.respuestas[this.respuestas.length - 1])
