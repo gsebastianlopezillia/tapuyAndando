@@ -30,7 +30,6 @@ export class HomePage {
   respuestas: any = [];
   clave: any;
 
-  accion: any;
 
   opcionesConImagen: any = [];
   opcionesSinImagen: any = [];
@@ -86,26 +85,23 @@ export class HomePage {
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
     setTimeout(() => { this.traerEncuestaServidor(); }, 3600000);
-    this.accion+='-traerEncuestaServidor()-';
     console.log('Buscando encuesta en servidor');
     this.http.getJsonData();
     this.getEncuesta();
   }
 
   elDemonio() {
-    this.accion+='-elDemonio()-';
     console.log('Pasando datos a memoria y sincronizando');
     setTimeout(() => { this.elDemonio(); }, 15000);
     this.sincronizar();
   }
 
   sincronizar() {
-    this.accion+='-sincronizar()-';
     if (this.respuestas.length > 0) {
       console.log('entra al if');
       this.insertRespuesta(this.respuestas[this.respuestas.length - 1])
         .then(() => {
-          this.respuestas.pop()
+          this.respuestas.pop();
           console.log('hace el pop');
         })
     } else {
@@ -117,7 +113,7 @@ export class HomePage {
 
   continuara() {
     var cantRespondida = this.aGuardar.opciones;
-    setTimeout(() => { this.continuaraAux(cantRespondida); }, 6000);
+    setTimeout(() => { this.continuaraAux(cantRespondida); }, 45000);
   }
 
   continuaraAux(val) {
@@ -140,7 +136,9 @@ export class HomePage {
     this.opcionesSinImagen = [];
     this.conImagenes = true;
     var pregCont = document.getElementById("preguntaContainer");
-    pregCont.style.height = "35%";
+    pregCont.style.height = "100%";
+    pregCont.style.fontSize = "17em";
+
     pregCont.innerHTML = 'GRACIAS';
     setTimeout(() => { this.cargaTemplate1(); }, 15000);
   }
@@ -155,6 +153,8 @@ export class HomePage {
     console.log(opcionesPregunta1);
     var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "35%";
+    pregCont.style.fontSize = "6.5em";
+
     pregCont.innerHTML = this.preguntaInicial.pregunta;
     if (this.conImagenes) {
       this.opcionesInicialesCI = opcionesPregunta1;
@@ -176,6 +176,7 @@ export class HomePage {
 
       if (preguntaActual.pregunta != null) {
         pregCont.style.height = "35%";
+        pregCont.style.fontSize = "6.5em";
         pregCont.innerHTML = preguntaActual.pregunta;
       } else {
         pregCont.style.height = "0%";
