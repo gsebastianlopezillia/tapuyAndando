@@ -75,7 +75,7 @@ export class HomePage {
     private device: Device) {
     platform.ready().then(() => {
       this.traerEncuestaServidor()
-      setTimeout(() => { this.encuesta = this.getEncuesta(); }, 3000);
+      setTimeout(() => { this.encuesta = this.getEncuesta(); }, 30000);
       this.setUuid();
       setTimeout(() => { this.elDemonio(); }, 30000);
     });

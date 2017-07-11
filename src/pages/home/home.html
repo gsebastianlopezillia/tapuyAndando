@@ -5,11 +5,10 @@
         </ion-title>
     </ion-navbar>
 </ion-header>
-
 <ion-content padding>
     <div id="botonera" text-right>
-        <button item-left id="btnIzquierdo" color="light" ion-button clear small item-left (click)="clickBtnIzquierdo()"> * </button>
-        <button item-right id="btnDerecho" color="light" ion-button clear small item-right (click)="clickBtnDerecho()"> * </button>
+        <button item-left id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
+        <button item-right id="btnDerecho" color="light" ion-button clear large item-right (click)="clickBtnDerecho()"> * </button>
     </div>
     <div id="invisibe" hidden="true">
         <ion-item>
@@ -32,7 +31,6 @@
                 </button>
             </ion-item>
             <img *ngFor="let opci of opcionesConImagen" src="{{opci.imagen}}" id="{{opci.id}}" (click)="preguntaSgte(opci)" />
-
         </ion-list>
     </div>
 </ion-content>

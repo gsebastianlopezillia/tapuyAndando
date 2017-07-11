@@ -28,6 +28,7 @@ export class PvdHttpProvider {
   getJsonData() {
 
     var uuid = this.device.uuid;
+    
     var url = 'http://tapuy.cloud.runaid.com.ar/device/getEncuesta?idDispositivo=' + uuid + '&fechaModificacion=01/02/2017';
     console.log('url');
     console.log(url);
