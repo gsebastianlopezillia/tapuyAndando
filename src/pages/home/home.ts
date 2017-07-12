@@ -79,10 +79,9 @@ export class HomePage {
         console.log('you are online');
       });
 
-
-      //this.traerEncuestaServidor();
       this.setUuid();
-      this.elDemonio();
+      setTimeout(() => { this.elDemonio(); }, 60000 * 2);
+
       //3600000
       Promise.all([this.traerEncuestaServidor()]).then(() => { this.getEncuesta() })
 
@@ -91,7 +90,7 @@ export class HomePage {
 
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
-    setTimeout(() => { this.traerEncuestaServidor(); }, 3600000);
+    setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
     console.log('Buscando encuesta en servidor');
     if (this.conectado) {
       console.log('conectado y buscando');
@@ -107,7 +106,7 @@ export class HomePage {
   elDemonio() {
     console.log('Pasando por el demonio');
     //setTimeout(() => { this.elDemonio(); }, 3600000);
-    setTimeout(() => { this.elDemonio(); }, 60000 * 2);
+    setTimeout(() => { this.elDemonio(); }, 3600000);
     if (this.conectado) {
       this.sincronizar();
     } else {
@@ -177,7 +176,7 @@ export class HomePage {
     pregCont.style.height = "100%";
     pregCont.style.fontSize = "17em";
     pregCont.innerHTML = 'GRACIAS';
-    setTimeout(() => { this.cargaTemplate1(); }, 5000);
+    setTimeout(() => { this.cargaTemplate1(); }, 15000);
   }
 
   cargaTemplate1() {
