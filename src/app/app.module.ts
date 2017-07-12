@@ -4,12 +4,12 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { CameraPreview } from '@ionic-native/camera-preview';
-import { Http } from '@angular/http';
 import { HttpModule } from '@angular/http';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+import { SQLite } from '@ionic-native/sqlite';
 import { Device } from '@ionic-native/device'
 import { AndroidFullScreen } from '@ionic-native/android-full-screen'
+import { Network } from '@ionic-native/network';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -49,6 +49,7 @@ import { PvdSqliteProvider } from '../providers/pvd-sqlite/pvd-sqlite';
     PvdHttpProvider,
     PvdStorageProvider,
     PvdSqliteProvider,
+    Network,
   ]
 })
 export class AppModule {}

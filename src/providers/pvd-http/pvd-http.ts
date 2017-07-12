@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Http, Headers, RequestOptions } from '@angular/http';
 import { Device } from '@ionic-native/device'
 
 import 'rxjs/add/operator/map';
@@ -26,7 +25,7 @@ export class PvdHttpProvider {
   }
 
   getJsonData() {
-
+    console.log('Entro a getJsonData');
     var uuid = this.device.uuid;
     
     var url = 'http://tapuy.cloud.runaid.com.ar/device/getEncuesta?idDispositivo=' + uuid + '&fechaModificacion=01/02/2017';
@@ -74,6 +73,7 @@ export class PvdHttpProvider {
   callPost3(objRespuesta) {
     console.log('entra a callPost3');
     let url = 'http://tapuy.cloud.runaid.com.ar/device/addFormulario';
+    //let url = 'http://192.168.0.60:8080/tapuy/device/addFormulario';
     let body = JSON.stringify(objRespuesta);
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });

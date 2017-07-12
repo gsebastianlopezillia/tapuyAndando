@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavController, NavParams, Platform } from 'ionic-angular';
 import { Device } from '@ionic-native/device'
 import { NativeStorage } from '@ionic-native/native-storage';
-import { CameraPreview, CameraPreviewPictureOptions, CameraPreviewOptions, CameraPreviewDimensions } from '@ionic-native/camera-preview';
+import { CameraPreview, CameraPreviewPictureOptions } from '@ionic-native/camera-preview';
+import { Network } from '@ionic-native/network';
 
 import { PvdHttpProvider } from '../../providers/pvd-http/pvd-http';
 import { PvdCameraProvider } from '../../providers/pvd-camera/pvd-camera';
@@ -16,7 +17,7 @@ declare let KioskPlugin: any;
   selector: 'page-home',
   templateUrl: 'home.html',
   providers: [PvdHttpProvider, PvdCameraProvider, PvdStorageProvider, PvdSqliteProvider, NgModel]
-  
+
 })
 
 export class HomePage {
@@ -30,12 +31,13 @@ export class HomePage {
   respuestas: any = [];
   clave: any;
 
-
   opcionesConImagen: any = [];
   opcionesSinImagen: any = [];
 
   contadorBtnDer: any = 0;
   contadorBtnIzq: any = 0;
+
+  conectado: boolean = true;
 
   aGuardar: any = {
     foto: '',
@@ -53,17 +55,7 @@ export class HomePage {
     height: 500,
     quality: 20
   };
-  private cameraPreviewOpts: CameraPreviewOptions = {
-    x: 0,
-    y: 0,
-    width: window.screen.width,
-    height: window.screen.height,
-    camera: 'front',
-    tapPhoto: false,
-    previewDrag: false,
-    toBack: true,
-    alpha: 1
-  };
+
   //fin camera params
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -73,12 +65,27 @@ export class HomePage {
     public storage: PvdStorageProvider,
     public nativeStorage: NativeStorage,
     public camera: CameraPreview,
-    private device: Device) {
+    private device: Device,
+    private network: Network) {
     platform.ready().then(() => {
-      this.traerEncuestaServidor()
-      setTimeout(() => { this.encuesta = this.getEncuesta(); }, 30000);
+
+      let disconnectSub = this.network.onDisconnect().subscribe(() => {
+        this.conectado = false;
+        console.log('you are offline');
+      });
+
+      let connectSub = this.network.onConnect().subscribe(() => {
+        this.conectado = true;
+        console.log('you are online');
+      });
+
+
+      //this.traerEncuestaServidor();
       this.setUuid();
-      setTimeout(() => { this.elDemonio(); }, 30000);
+      this.elDemonio();
+      //3600000
+      Promise.all([this.traerEncuestaServidor()]).then(() => { this.getEncuesta() })
+
     });
   }
 
@@ -86,29 +93,60 @@ export class HomePage {
   traerEncuestaServidor() {
     setTimeout(() => { this.traerEncuestaServidor(); }, 3600000);
     console.log('Buscando encuesta en servidor');
-    this.http.getJsonData();
-    this.getEncuesta();
+    if (this.conectado) {
+      console.log('conectado y buscando');
+      Promise.all([this.http.getJsonData()])
+        .then(() => {
+          this.getEncuesta();
+        })
+    } else {
+      console.log('No conectado - No busco.');
+    }
   }
 
   elDemonio() {
-    console.log('Pasando datos a memoria y sincronizando');
-    setTimeout(() => { this.elDemonio(); }, 15000);
-    this.sincronizar();
+    console.log('Pasando por el demonio');
+    //setTimeout(() => { this.elDemonio(); }, 3600000);
+    setTimeout(() => { this.elDemonio(); }, 60000 * 2);
+    if (this.conectado) {
+      this.sincronizar();
+    } else {
+      this.cargaTemplate1();
+    }
   }
 
   sincronizar() {
-    if (this.respuestas.length > 0) {
-      console.log('entra al if');
-      this.insertRespuesta(this.respuestas[this.respuestas.length - 1])
-        .then(() => {
-          this.respuestas.pop();
-          console.log('hace el pop');
-        })
+    if (this.conectado) {
+      this.opcionesConImagen = [];
+      this.opcionesSinImagen = [];
+      this.conImagenes = true;
+      let pregCont = document.getElementById("preguntaContainer");
+      pregCont.style.height = "100%";
+      pregCont.innerHTML = 'MANTENIMIENTO <br/><img src="img/logo.png" style="heigth: 50%; width:50%">';
+      let opcContainer = document.getElementById('opcionesContainer');
+      opcContainer.setAttribute('hidden', 'true');
+
+      this.sincronizarBase();
     } else {
-      console.log('entra al else');
-      this.sqlite.sincroniza();
+      this.cargaTemplate1();
     }
-    //setTimeout(() => { this.sincronizar(); }, 30000);
+  }
+
+  sincronizarBase() {
+    Promise.all([this.sqlite.count()])
+      .then(res => {
+        if (res[0] > 0 && this.conectado) {
+          console.log('this.sqlite.sincroniza():');
+          Promise.all([this.sqlite.sincroniza()])
+            .then(() => {
+              this.sincronizarBase();
+            })
+        } else {
+          console.log('Desconectado/baseVacia - No-Sincronizando');
+          console.log(res[0]);
+          this.cargaTemplate1();
+        }
+      })
   }
 
   continuara() {
@@ -122,25 +160,24 @@ export class HomePage {
     }
   }
 
+
+
   /*FIN SINCRONIZACION-----------------------------------------------------*/
 
   /*LOGICA-----------------------------------------------------------------*/
   finalizaEncuesta() {
-    let resp = this.aGuardar;
-    this.respuestas.push(resp);
-    console.log('resp');
+    let resp = JSON.stringify(this.aGuardar);
+    console.log('resp stringuifeada');
     console.log(resp);
-    console.log('this.respuestas');
-    console.log(this.respuestas);
+    this.sqlite.insertRespuesta(resp);
     this.opcionesConImagen = [];
     this.opcionesSinImagen = [];
     this.conImagenes = true;
     var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "100%";
     pregCont.style.fontSize = "17em";
-
     pregCont.innerHTML = 'GRACIAS';
-    setTimeout(() => { this.cargaTemplate1(); }, 15000);
+    setTimeout(() => { this.cargaTemplate1(); }, 5000);
   }
 
   cargaTemplate1() {
@@ -151,6 +188,8 @@ export class HomePage {
     var opcionesPregunta1 = this.opcionesPregunta(this.preguntaInicial);
     console.log('opcionesPregunta1');
     console.log(opcionesPregunta1);
+    let opcContainer = document.getElementById('opcionesContainer');
+    opcContainer.removeAttribute('hidden');
     var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "35%";
     pregCont.style.fontSize = "6.5em";
@@ -194,7 +233,11 @@ export class HomePage {
 
   setAGuardar(opcion) {
     this.aGuardar.idDispositivo = this.uuid;
-    this.aGuardar.fecha = new Date().toLocaleString();
+    let date = new Date();
+    let myFormattedDate = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + '-' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
+    this.aGuardar.fecha = myFormattedDate;
+    console.log('this.aGuardar.fecha');
+    console.log(this.aGuardar.fecha);
     this.aGuardar.idEncuesta = this.encuesta.json.encuesta;
   }
 
@@ -255,7 +298,9 @@ export class HomePage {
   insertRespuesta(obj) {
     console.log('obj de insert');
     console.log(obj);
-    return this.sqlite.insertRespuesta(JSON.stringify(obj));
+    return this.sqlite.insertRespuesta(JSON.stringify(obj))
+      .catch(e => {
+      })
   }
 
   /*FIN SQLITE-------------------------------------------------------------*/
@@ -269,13 +314,18 @@ export class HomePage {
 
   /*HTTP-------------------------------------------------------------------*/
   getEncuestaRemota() {
-    this.encuesta = this.http.getJsonData();
+    Promise.all([this.http.getJsonData()])
+      .then(res => {
+        this.encuesta = res[0];
+        console.log('getEncuestaRemota :');
+        console.log(this.encuesta)
+      })
   }
 
   /*FIN HTTP---------------------------------------------------------------*/
 
   /*KIOSK-MODE-------------------------------------------------------------*/
-  setClave(c){
+  setClave(c) {
     this.clave = c;
   }
 
@@ -287,7 +337,7 @@ export class HomePage {
     if (this.contadorBtnIzq != 2) {
       this.contadorBtnDer = 0;
       this.contadorBtnIzq = 0;
-    }else{
+    } else {
       this.contadorBtnDer++;
     }
   }
@@ -342,9 +392,9 @@ export class HomePage {
     this.clave = '';
   }
 
-  desbloquear(){
+  desbloquear() {
     let clave = document.getElementById('clave');
-    if(this.clave == 'lentes'){
+    if (this.clave == 'lentes') {
       this.deshabilitaKiosko();
     }
   }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { PvdHttpProvider } from '../../providers/pvd-http/pvd-http';
 
 import 'rxjs/add/operator/map';
@@ -13,7 +12,6 @@ import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 export class PvdSqliteProvider {
   private options = { name: "tapuy.db", location: 'default' };
   private queryCreateTableRespuestas = 'create table if not exists respuestas(idRespuesta INTEGER PRIMARY KEY AUTOINCREMENT, respuesta)';
-  private sincroFlag: boolean = false;
 
   dbTapuy: SQLiteObject;
 
@@ -45,46 +43,63 @@ export class PvdSqliteProvider {
     })
   }
 
-  sincroniza() {
-    if (!this.sincroFlag) {
-      this.sincroFlag = true;
-      let postQuery = "SELECT * FROM respuestas WHERE idRespuesta IN (SELECT MIN(idRespuesta) FROM respuestas)";
-      console.log('entra a sincroniza');
-      return this.dbTapuy.executeSql(postQuery, [])
-        .then(res => {
-          console.log('ejecuta el select');
-          let resVieja = res.rows.item(0);
-          console.log('resVieja');
-          console.log(resVieja);
-          if (resVieja != undefined) {
-            this.http.callPost3(resVieja)
-              .then(res2 => {
-                console.log('res de la llamada al post de sinc');
-                console.log(res2);
-                if (JSON.parse(JSON.stringify(res2)).respuesta) {
-                  console.log('entro al if');
-                  let deleteQuery = 'DELETE FROM respuestas WHERE idRespuesta in (SELECT MIN(idRespuesta) FROM respuestas)';
-                  this.dbTapuy.executeSql(deleteQuery, [])
-                    .then(() => {
-                      console.log('borro');
-                      this.sincroFlag = false;
-                    });
-                }else{
-                  this.sincroFlag = false;
-                }
-              })
-          } else {
-            console.log('base vacia');
-            this.sincroFlag = false;
-          }
-        }).catch(e => {
-          this.sincroFlag = false;
-          console.log('e');
-          console.log(e);
-        })
-    }else{
-      console.log('Flag activa');
-    }
+  getPrimerRespuesta() {
+    let postQuery2 = "SELECT * FROM respuestas WHERE idRespuesta IN (SELECT MIN(idRespuesta) FROM respuestas)";
+    return this.dbTapuy.executeSql(postQuery2, [])
+      .then(respuesta => {
+        return respuesta;
+      },
+      err=>{
+        console.log('error getPrimerRespuesta')
+        console.log(err);
+      })
+  }
 
+  enviarRespuesta(respuesta) {
+    return this.http.callPost3(respuesta)
+      .then(llego => {
+        console.log('respuesta servidor:');
+        console.log(llego);
+        return llego;
+      },
+      err=>{
+        console.log('error enviarRespuesta')
+        console.log(err);
+      })
+  }
+
+  deletePrimerRespuesta() {
+    let deleteQuery = 'DELETE FROM respuestas WHERE idRespuesta in (SELECT MIN(idRespuesta) FROM respuestas)';
+    return this.dbTapuy.executeSql(deleteQuery, [])
+      .then(res => {
+        console.log('respuestas borradas');
+        console.log(res.rowsAffected);
+        return res;
+      },
+      err=>{
+        console.log('error deletePrimerRespuesta')
+        console.log(err);
+      })
+  }
+
+  sincroniza() {
+    let countQuery = 'SELECT COUNT(idRespuesta) cant FROM respuestas';
+    let mando = false;
+    return Promise.all([this.getPrimerRespuesta()])
+      .then(respuesta => {
+        Promise.all([this.enviarRespuesta(respuesta[0].rows.item(0)), this.dbTapuy.executeSql(countQuery, [])])
+          .then(llego => {
+            if (llego[0].respuesta) {
+              this.deletePrimerRespuesta()
+            }
+            return llego[1].rows.item(0).cant;
+          })
+      })
+  }
+
+  count(){
+    let countQuery = 'SELECT COUNT(idRespuesta) cant FROM respuestas';
+    return this.dbTapuy.executeSql(countQuery, [])
+    .then(res =>{return res.rows.item(0).cant})
   }
 }
