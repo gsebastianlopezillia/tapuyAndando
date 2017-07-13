@@ -121,7 +121,7 @@ export class HomePage {
       this.conImagenes = true;
       let pregCont = document.getElementById("preguntaContainer");
       pregCont.style.height = "100%";
-      pregCont.innerHTML = 'MANTENIMIENTO <br/><img src="img/logo.png" style="heigth: 50%; width:50%">';
+      pregCont.innerHTML = 'MANTENIMIENTO <br/><img src="img/imagenencuesta.jpg" style="heigth: 100%; width:100%">';
       let opcContainer = document.getElementById('opcionesContainer');
       opcContainer.setAttribute('hidden', 'true');
 
@@ -332,14 +332,14 @@ export class HomePage {
     KioskPlugin.exitKiosk();
   }
 
-  clickBtnDerecho() {
+  /*clickBtnDerecho() {
     if (this.contadorBtnIzq != 2) {
       this.contadorBtnDer = 0;
       this.contadorBtnIzq = 0;
     } else {
       this.contadorBtnDer++;
     }
-  }
+  }*/
 
   clickBtnIzquierdo() {
     this.contadorBtnIzq++;
@@ -347,7 +347,10 @@ export class HomePage {
   }
 
   confirmaClave() {
-    switch (this.contadorBtnIzq) {
+    if (this.contadorBtnIzq == 3) {
+      this.showClave();
+    }
+    /*switch (this.contadorBtnIzq) {
       case 1: {
         if (this.contadorBtnDer != 0) {
           this.contadorBtnDer = 0;
@@ -376,19 +379,20 @@ export class HomePage {
         this.contadorBtnIzq = 0;
         break;
       }
-    }
+    }*/
   }
 
   showClave() {
     let divClave = document.getElementById('invisibe');
     divClave.removeAttribute("hidden");
-    setTimeout(() => { this.hideClave(); }, 30000);
+    setTimeout(() => { this.hideClave(); }, 25000);
   }
 
   hideClave() {
     let divClave = document.getElementById('invisibe');
     divClave.setAttribute("hidden", "true");
     this.clave = '';
+    this.contadorBtnIzq = 0;
   }
 
   desbloquear() {
