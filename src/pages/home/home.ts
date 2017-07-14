@@ -67,12 +67,11 @@ export class HomePage {
     private device: Device,
     private network: Network) {
     platform.ready().then(() => {
-      console.log('Lama iniciar() de pvd-sqlite en home');
       setTimeout(() => { this.elDemonio(); }, 60000 * 2);
       this.traerEncuestaServidor()
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
-        console.log('you are offline');
+        console.error('you are offline');
       });
 
       let connectSub = this.network.onConnect().subscribe(() => {
@@ -127,12 +126,9 @@ export class HomePage {
   sincronizarBase() {
     this.sqlite.count()
       .then(res => {
-        console.log('home sincronizarBase() sqlite.count()');
-        console.log(res);
-        if (res[0] > 0 && this.conectado) {
-          console.log('this.sqlite.sincroniza():');
-          Promise.all([this.sqlite.sincroniza()])
-            .then(() => {
+        if (res > 0 && this.conectado) {
+          this.sqlite.sincroniza()
+            .then((res) => {
               this.sincronizarBase();
             })
         } else {

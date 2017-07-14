@@ -50,24 +50,4 @@ export class PvdHttpProvider {
       .map(res => res.json())
       .toPromise()
   }
-
-  /*callPost(objRespuesta) {
-    console.log('pvd-http callPost()->');
-    let url = this.urlBase + 'addFormulario';
-    let body = JSON.stringify(objRespuesta);
-    let headers = new Headers({ 'Content-Type': 'application/json' });
-    let options = new RequestOptions({ headers: headers });
-    return this.http
-      .post(url, body, options)
-      .map(res => res.json())
-      .map(data => {
-        return Promise.resolve(data);
-      })
-      .toPromise().catch(e => {
-        console.log('Time out')
-        console.log(e)
-      })
-
-  }*/
-
 }

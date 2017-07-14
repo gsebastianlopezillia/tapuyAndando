@@ -58,8 +58,8 @@ export class PvdSqliteProvider {
   enviarRespuesta(respuesta) {
     return this.http.callPost(respuesta)
       .then(llego => {
-        console.log('respuesta servidor:');
-        console.log(llego);
+        //console.log('respuesta servidor:');
+        console.log(llego.respuesta);
         return llego;
       },
       err=>{
@@ -72,8 +72,9 @@ export class PvdSqliteProvider {
     let deleteQuery = 'DELETE FROM respuestas WHERE idRespuesta in (SELECT MIN(idRespuesta) FROM respuestas)';
     return this.dbTapuy.executeSql(deleteQuery, [])
       .then(res => {
-        console.log('respuestas borradas');
-        console.log(res.rowsAffected);
+        //console.log('respuestas borradas');
+        //console.log(res.rowsAffected);
+        console.log('Borro '+res.rowsAffected+ 'respuesta.');
         return res;
       },
       err=>{
@@ -87,7 +88,7 @@ export class PvdSqliteProvider {
     let mando = false;
     return Promise.all([this.getPrimerRespuesta()])
       .then(respuesta => {
-        Promise.all([this.enviarRespuesta(respuesta[0].rows.item(0)), this.dbTapuy.executeSql(countQuery, [])])
+        return Promise.all([this.enviarRespuesta(respuesta[0].rows.item(0)), this.dbTapuy.executeSql(countQuery, [])])
           .then(llego => {
             if (llego[0].respuesta) {
               this.deletePrimerRespuesta()
