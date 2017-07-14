@@ -18,11 +18,11 @@ export class PvdHttpProvider {
   }
 
   getJsonData() {
-    console.log('pvd-http getJsonData()->');
+    //console.log('pvd-http getJsonData()->');
     this.getJsonData2()
       .then((response) => {
-        console.log('Success pvd-http getJsonData():');
-        console.log(response);
+        //console.log('Success pvd-http getJsonData():');
+        //console.log(response);
         this.pvdStorage.setEncuesta(response);
       })
       .catch((error) => {
@@ -32,7 +32,7 @@ export class PvdHttpProvider {
   }
 
   getJsonData2() {
-    console.log('pvd-http getJsonData2()->');
+   //console.log('pvd-http getJsonData2()->');
     return this.http
       .get(this.urlBase + 'getEncuesta?idDispositivo=' + this.device.uuid + '&fechaModificacion=01/02/2017')
       .map((response) => response.json())

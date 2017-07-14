@@ -125,7 +125,7 @@ export class HomePage {
   }
 
   sincronizarBase() {
-    Promise.all([this.sqlite.count()])
+    this.sqlite.count()
       .then(res => {
         console.log('home sincronizarBase() sqlite.count()');
         console.log(res);

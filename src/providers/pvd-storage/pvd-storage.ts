@@ -16,7 +16,7 @@ export class PvdStorageProvider {
           .setItem('encuesta', encuesta)
           .then(
           () => {
-            console.log('Success pvd-storage setEncuesta()');
+            //console.log('Success pvd-storage setEncuesta()');
             return (true);
           },
           err => {
