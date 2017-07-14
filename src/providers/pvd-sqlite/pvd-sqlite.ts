@@ -26,7 +26,7 @@ export class PvdSqliteProvider {
   crearBase() {
     return this.dbTapuy.executeSql(this.queryCreateTableRespuestas, [])
       .then(() => {//crea tabla respuestas
-        return Promise.resolve(console.log('**Tabla creada con éxito**'));
+        return console.log('**Tabla creada con éxito**');
       })
   }
 

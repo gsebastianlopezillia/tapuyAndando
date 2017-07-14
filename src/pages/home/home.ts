@@ -34,7 +34,6 @@ export class HomePage {
   opcionesConImagen: any = [];
   opcionesSinImagen: any = [];
 
-  contadorBtnDer: any = 0;
   contadorBtnIzq: any = 0;
 
   conectado: boolean = true;
@@ -55,8 +54,8 @@ export class HomePage {
     height: 500,
     quality: 20
   };
-
   //fin camera params
+  //----------------------------------------------------------------------------------------
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public platform: Platform,
@@ -68,8 +67,9 @@ export class HomePage {
     private device: Device,
     private network: Network) {
     platform.ready().then(() => {
-      this.storage.getEncuesta();
-
+      console.log('Lama iniciar() de pvd-sqlite en home');
+      setTimeout(() => { this.elDemonio(); }, 60000 * 2);
+      this.traerEncuestaServidor()
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
         console.log('you are offline');
@@ -79,34 +79,28 @@ export class HomePage {
         this.conectado = true;
         console.log('you are online');
       });
-
-      this.setUuid();
-      setTimeout(() => { this.elDemonio(); }, 60000 * 2);
-
-      //3600000
-      Promise.all([this.traerEncuestaServidor()]).then(() => { this.getEncuesta() })
-
+      this.uuid = this.device.uuid;
     });
   }
 
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
     //setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
-    setTimeout(() => { this.traerEncuestaServidor(); }, 6000*4);
+    setTimeout(() => { this.traerEncuestaServidor(); }, 6000 * 4);
     if (this.conectado) {
       Promise.all([this.http.getJsonData()])
         .then(() => {
           this.getEncuesta();
         })
     } else {
-      console.log('No conectado - No busco.');
+      console.error('No conectado - No busco.');
     }
   }
 
   elDemonio() {
     console.log('Pasando por el demonio');
     //setTimeout(() => { this.elDemonio(); }, 3600000);
-    setTimeout(() => { this.elDemonio(); }, 60000*3);
+    setTimeout(() => { this.elDemonio(); }, 60000 * 3);
     if (this.conectado) {
       this.sincronizar();
     } else {
@@ -124,7 +118,6 @@ export class HomePage {
       pregCont.innerHTML = '<img src="img/imagenencuesta.jpg" style="heigth: 100%; width:100%">';
       let opcContainer = document.getElementById('opcionesContainer');
       opcContainer.setAttribute('hidden', 'true');
-
       this.sincronizarBase();
     } else {
       this.cargaTemplate1();
@@ -134,6 +127,8 @@ export class HomePage {
   sincronizarBase() {
     Promise.all([this.sqlite.count()])
       .then(res => {
+        console.log('home sincronizarBase() sqlite.count()');
+        console.log(res);
         if (res[0] > 0 && this.conectado) {
           console.log('this.sqlite.sincroniza():');
           Promise.all([this.sqlite.sincroniza()])
@@ -142,7 +137,6 @@ export class HomePage {
             })
         } else {
           console.log('Desconectado/baseVacia - No-Sincronizando');
-          console.log(res[0]);
           this.cargaTemplate1();
         }
       })
@@ -159,15 +153,11 @@ export class HomePage {
     }
   }
 
-
-
   /*FIN SINCRONIZACION-----------------------------------------------------*/
 
   /*LOGICA-----------------------------------------------------------------*/
   finalizaEncuesta() {
     let resp = JSON.stringify(this.aGuardar);
-    console.log('resp stringuifeada');
-    console.log(resp);
     this.sqlite.insertRespuesta(resp);
     this.opcionesConImagen = [];
     this.opcionesSinImagen = [];
@@ -176,7 +166,8 @@ export class HomePage {
     pregCont.style.height = "100%";
     pregCont.style.fontSize = "17em";
     pregCont.innerHTML = 'GRACIAS';
-    setTimeout(() => { this.cargaTemplate1(); }, 15000);
+    //dejar el gracias en 15 segundos
+    setTimeout(() => { this.cargaTemplate1(); }, 10000);
   }
 
   cargaTemplate1() {
@@ -188,7 +179,6 @@ export class HomePage {
     var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "35%";
     pregCont.style.fontSize = "6.5em";
-
     pregCont.innerHTML = this.preguntaInicial.pregunta;
     if (this.conImagenes) {
       this.opcionesInicialesCI = opcionesPregunta1;
@@ -287,36 +277,6 @@ export class HomePage {
 
   /*FIN FILTROS------------------------------------------------------------*/
 
-  /*SQLITE-----------------------------------------------------------------*/
-  insertRespuesta(obj) {
-    console.log('obj de insert');
-    console.log(obj);
-    return this.sqlite.insertRespuesta(JSON.stringify(obj))
-      .catch(e => {
-      })
-  }
-
-  /*FIN SQLITE-------------------------------------------------------------*/
-
-  /*DEVICE-----------------------------------------------------------------*/
-  setUuid() {
-    this.uuid = this.device.uuid;
-  }
-
-  /*FIN DEVICE-------------------------------------------------------------*/
-
-  /*HTTP-------------------------------------------------------------------*/
-  getEncuestaRemota() {
-    Promise.all([this.http.getJsonData()])
-      .then(res => {
-        this.encuesta = res[0];
-        console.log('getEncuestaRemota :');
-        console.log(this.encuesta)
-      })
-  }
-
-  /*FIN HTTP---------------------------------------------------------------*/
-
   /*KIOSK-MODE-------------------------------------------------------------*/
   setClave(c) {
     this.clave = c;
@@ -325,15 +285,6 @@ export class HomePage {
   deshabilitaKiosko() {
     KioskPlugin.exitKiosk();
   }
-
-  /*clickBtnDerecho() {
-    if (this.contadorBtnIzq != 2) {
-      this.contadorBtnDer = 0;
-      this.contadorBtnIzq = 0;
-    } else {
-      this.contadorBtnDer++;
-    }
-  }*/
 
   clickBtnIzquierdo() {
     this.contadorBtnIzq++;
@@ -344,36 +295,6 @@ export class HomePage {
     if (this.contadorBtnIzq == 3) {
       this.showClave();
     }
-    /*switch (this.contadorBtnIzq) {
-      case 1: {
-        if (this.contadorBtnDer != 0) {
-          this.contadorBtnDer = 0;
-          this.contadorBtnIzq = 0;
-        }
-        break;
-      }
-      case 2: {
-        if (this.contadorBtnDer != 0) {
-          this.contadorBtnDer = 0;
-          this.contadorBtnIzq = 0;
-        }
-        break;
-      }
-      case 3: {
-        if (this.contadorBtnDer != 1) {
-          this.contadorBtnDer = 0;
-          this.contadorBtnIzq = 0;
-        } else {
-          this.showClave();
-        }
-        break;
-      }
-      default: {
-        this.contadorBtnDer = 0;
-        this.contadorBtnIzq = 0;
-        break;
-      }
-    }*/
   }
 
   showClave() {
@@ -400,21 +321,32 @@ export class HomePage {
 
   /*NATIVE-STORAGE---------------------------------------------------------*/
   getEncuesta() {//not tocar
-    this.nativeStorage.getItem('encuesta').then(
-      data => {
-        this.encuesta = JSON.parse(JSON.stringify(data));
-        this.preguntas = this.encuesta.json.preguntas;
-        this.preguntas.sort(function (a, b) { return a.orden - b.orden });
-        this.opciones = this.encuesta.json.opciones;
-        this.opciones.sort(function (a, b) { return a.orden - b.orden });
-        this.cargaTemplate1();
-      },
-      error => {
-        console.error('Error reading item ');
-        console.error(JSON.parse(error))
+    return this.nativeStorage.keys()
+      .then((response) => {
+        return response;
+      })
+      .then((response2) => {
+        if (response2.length > 0) {
+          this.nativeStorage.getItem('encuesta').then(
+            data => {
+              console.log('Success home getEncuesta() getItem():');
+              console.log(data);
+              this.encuesta = JSON.parse(JSON.stringify(data));
+              this.preguntas = this.encuesta.json.preguntas;
+              this.preguntas.sort(function (a, b) { return a.orden - b.orden });
+              this.opciones = this.encuesta.json.opciones;
+              this.opciones.sort(function (a, b) { return a.orden - b.orden });
+              this.cargaTemplate1();
+            },
+            error => {
+              console.error('Fail home getEncuesta():');
+              console.error(JSON.parse(error))
+            });
+        } else {
+          console.error('Fail home getEncuesta(): storage vacío');
+        }
       });
   }
-
   /*FIN NATIVE-STORAGE-----------------------------------------------------*/
 
   /*CAMERA-----------------------------------------------------------------*/
