@@ -56,7 +56,7 @@ export class PvdSqliteProvider {
   }
 
   enviarRespuesta(respuesta) {
-    return this.http.callPost3(respuesta)
+    return this.http.callPost(respuesta)
       .then(llego => {
         console.log('respuesta servidor:');
         console.log(llego);

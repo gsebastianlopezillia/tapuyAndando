@@ -90,7 +90,8 @@ export class HomePage {
 
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
-    setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
+    //setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
+    setTimeout(() => { this.traerEncuestaServidor(); }, 6000*4);
     console.log('Buscando encuesta en servidor');
     if (this.conectado) {
       console.log('conectado y buscando');
@@ -106,7 +107,7 @@ export class HomePage {
   elDemonio() {
     console.log('Pasando por el demonio');
     //setTimeout(() => { this.elDemonio(); }, 3600000);
-    setTimeout(() => { this.elDemonio(); }, 3600000);
+    setTimeout(() => { this.elDemonio(); }, 60000*3);
     if (this.conectado) {
       this.sincronizar();
     } else {
@@ -121,7 +122,7 @@ export class HomePage {
       this.conImagenes = true;
       let pregCont = document.getElementById("preguntaContainer");
       pregCont.style.height = "100%";
-      pregCont.innerHTML = 'MANTENIMIENTO <br/><img src="img/imagenencuesta.jpg" style="heigth: 100%; width:100%">';
+      pregCont.innerHTML = '<img src="img/imagenencuesta.jpg" style="heigth: 100%; width:100%">';
       let opcContainer = document.getElementById('opcionesContainer');
       opcContainer.setAttribute('hidden', 'true');
 
