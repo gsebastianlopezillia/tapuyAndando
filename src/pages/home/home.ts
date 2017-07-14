@@ -68,6 +68,7 @@ export class HomePage {
     private device: Device,
     private network: Network) {
     platform.ready().then(() => {
+      this.storage.getEncuesta();
 
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
@@ -92,9 +93,7 @@ export class HomePage {
   traerEncuestaServidor() {
     //setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
     setTimeout(() => { this.traerEncuestaServidor(); }, 6000*4);
-    console.log('Buscando encuesta en servidor');
     if (this.conectado) {
-      console.log('conectado y buscando');
       Promise.all([this.http.getJsonData()])
         .then(() => {
           this.getEncuesta();
@@ -183,11 +182,7 @@ export class HomePage {
   cargaTemplate1() {
     this.clean();
     this.preguntaInicial = this.primerPregunta();
-    console.log('this.preguntaInicial');
-    console.log(this.preguntaInicial);
     var opcionesPregunta1 = this.opcionesPregunta(this.preguntaInicial);
-    console.log('opcionesPregunta1');
-    console.log(opcionesPregunta1);
     let opcContainer = document.getElementById('opcionesContainer');
     opcContainer.removeAttribute('hidden');
     var pregCont = document.getElementById("preguntaContainer");
@@ -236,8 +231,6 @@ export class HomePage {
     let date = new Date();
     let myFormattedDate = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + '-' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
     this.aGuardar.fecha = myFormattedDate;
-    console.log('this.aGuardar.fecha');
-    console.log(this.aGuardar.fecha);
     this.aGuardar.idEncuesta = this.encuesta.json.encuesta;
   }
 
