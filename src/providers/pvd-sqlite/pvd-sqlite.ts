@@ -74,7 +74,7 @@ export class PvdSqliteProvider {
       .then(res => {
         //console.log('respuestas borradas');
         //console.log(res.rowsAffected);
-        console.log('Borro '+res.rowsAffected+ 'respuesta.');
+        console.log('Borro '+res.rowsAffected+ ' respuesta.');
         return res;
       },
       err=>{
