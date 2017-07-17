@@ -8,7 +8,7 @@
 <ion-content padding>
     <div id="botonera" text-right>
         <button item-left id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
-        <button item-right id="btnDerecho" color="light" ion-button large item-right (click)="sincronizarBase()">SINC </button>
+        <!--button item-right id="btnDerecho" color="light" ion-button large item-right (click)="sincronizarBase()">SINC </button-->
     </div>
     <div id="invisibe" hidden="true">
         <ion-item>
@@ -36,4 +36,7 @@
             <img *ngFor="let opci of opcionesConImagen" src="{{opci.imagen}}" id="{{opci.id}}" (click)="preguntaSgte(opci)" />
         </ion-list>
     </div>
+    <!--div>
+        <ion-input type="text" [value]="consol" ([ngModel])="consol"></ion-input>
+    </div-->
 </ion-content>

@@ -21,6 +21,8 @@ declare let KioskPlugin: any;
 })
 
 export class HomePage {
+  //consol: String = '';
+
   uuid: String;
   encuesta: any;
   preguntaInicial: any;
@@ -85,7 +87,7 @@ export class HomePage {
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
     //setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
-    setTimeout(() => { this.traerEncuestaServidor(); }, 6000 * 4);
+    setTimeout(() => { this.traerEncuestaServidor(); }, 60000 * 121);
     if (this.conectado) {
       Promise.all([this.http.getJsonData()])
         .then(() => {
@@ -99,7 +101,7 @@ export class HomePage {
   elDemonio() {
     console.log('Pasando por el demonio');
     //setTimeout(() => { this.elDemonio(); }, 3600000);
-    setTimeout(() => { this.elDemonio(); }, 60000 * 3);
+    setTimeout(() => { this.elDemonio(); }, 60000 * 60);
     if (this.conectado) {
       this.sincronizar();
     } else {
@@ -108,6 +110,7 @@ export class HomePage {
   }
 
   sincronizar() {
+    //this.consol += 'Sincronizando -|-'
     if (this.conectado) {
       this.opcionesConImagen = [];
       this.opcionesSinImagen = [];
@@ -129,9 +132,11 @@ export class HomePage {
         if (res > 0 && this.conectado) {
           this.sqlite.sincroniza()
             .then((res) => {
+              //this.consol += 'enviaUnaRespuesta -|-'
               this.sincronizarBase();
             })
         } else {
+          //this.consol += 'baseVacia/Desconectado -|-';
           console.log('Desconectado/baseVacia - No-Sincronizando');
           this.cargaTemplate1();
         }
@@ -141,6 +146,7 @@ export class HomePage {
   continuara() {
     var cantRespondida = this.aGuardar.opciones;
     setTimeout(() => { this.continuaraAux(cantRespondida); }, 45000);
+    //setTimeout(() => { this.continuaraAux(cantRespondida); }, 20000);
   }
 
   continuaraAux(val) {
@@ -154,16 +160,17 @@ export class HomePage {
   /*LOGICA-----------------------------------------------------------------*/
   finalizaEncuesta() {
     let resp = JSON.stringify(this.aGuardar);
-    this.sqlite.insertRespuesta(resp);
-    this.opcionesConImagen = [];
-    this.opcionesSinImagen = [];
-    this.conImagenes = true;
+    //this.consol += 'guardaRespuesta -|-';
     var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "100%";
     pregCont.style.fontSize = "17em";
     pregCont.innerHTML = 'GRACIAS';
+    this.opcionesConImagen = [];
+    this.opcionesSinImagen = [];
+    this.conImagenes = true;
     //dejar el gracias en 15 segundos
     setTimeout(() => { this.cargaTemplate1(); }, 10000);
+    this.sqlite.insertRespuesta(resp);
   }
 
   cargaTemplate1() {
@@ -185,8 +192,6 @@ export class HomePage {
 
   preguntaSgte(opcion) {
     this.camera.takePicture(this.pictureOpts)
-    this.continuara();
-    this.aGuardar.opciones[this.aGuardar.opciones.length] = opcion.id;
     if (opcion.preguntasiguiente != null) {
       var preguntaActual = this.preguntaPorId(opcion.preguntasiguiente);
       var opcionesPreguntaActual = this.opcionesPregunta(preguntaActual);
@@ -210,6 +215,8 @@ export class HomePage {
     } else {
       this.finalizaEncuesta()
     }
+    this.continuara();
+    this.aGuardar.opciones[this.aGuardar.opciones.length] = opcion.id;
   }
 
   setAGuardar(opcion) {
