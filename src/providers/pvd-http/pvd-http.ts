@@ -10,24 +10,30 @@ import { PvdStorageProvider } from '../../providers/pvd-storage/pvd-storage';
 export class PvdHttpProvider {
 
   urlBase = 'http://tapuy.cloud.runaid.com.ar/device/';
-  //urlBase = 'http://192.168.0.53:8080/tapuy/device/';
+  //urlBase = 'http://192.168.0.51:8080/tapuy/device/';
 
   constructor(public http: Http,
     public pvdStorage: PvdStorageProvider,
     public device: Device) {
   }
 
-  getJsonData() {
+  getJsonData() {//promesa ok
     //console.log('pvd-http getJsonData()->');
-    this.getJsonData2()
+    return this.getJsonData2()
       .then((response) => {
         //console.log('Success pvd-http getJsonData():');
         //console.log(response);
-        this.pvdStorage.setEncuesta(response);
+        return this.pvdStorage.setEncuesta(response)
+          .then(res =>{
+            //console.log('getJsonData() res:')
+            //console.log(res)
+            return res
+          })
       })
       .catch((error) => {
-        console.error('Fail pvd-http getJsonData():');
-        console.error(error);
+        //console.error('Fail pvd-http getJsonData():');
+        //console.error(error);
+        return error
       });
   }
 
@@ -36,11 +42,12 @@ export class PvdHttpProvider {
     return this.http
       .get(this.urlBase + 'getEncuesta?idDispositivo=' + this.device.uuid + '&fechaModificacion=01/02/2017')
       .map((response) => response.json())
+      .timeout(30000)
       .toPromise();
   }
 
   callPost(objRespuesta) {
-    console.log('pvd-http callPost()->');
+    //console.log('pvd-http callPost()->');
     let url = this.urlBase + 'addFormulario';
     let body = JSON.stringify(objRespuesta);
     let headers = new Headers({ 'Content-Type': 'application/json' });

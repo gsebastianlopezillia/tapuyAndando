@@ -21,7 +21,7 @@ declare let KioskPlugin: any;
 })
 
 export class HomePage {
-  //consol: String = '';
+  consol: any = '';
 
   uuid: String;
   encuesta: any;
@@ -69,39 +69,60 @@ export class HomePage {
     private device: Device,
     private network: Network) {
     platform.ready().then(() => {
-      setTimeout(() => { this.elDemonio(); }, 60000 * 2);
-      this.traerEncuestaServidor()
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
-        console.error('you are offline');
+        this.loguear('Desconectado');
       });
 
       let connectSub = this.network.onConnect().subscribe(() => {
         this.conectado = true;
-        console.log('you are online');
+        this.loguear('Conectado');
+        this.traerEncuestaServidor()
       });
+
+      if (this.network.type === 'none') {
+        this.conectado = false
+        this.loguear('Device sin conexión')
+      }
+
+      //setTimeout(() => { this.elDemonio(); }, 60000 * 60)
+      setTimeout(() => { this.elDemonio(); }, 60000 * 2)
+      this.traerEncuestaServidor()
+
       this.uuid = this.device.uuid;
     });
   }
 
+  loguear(text: any) {
+    console.log(text + ' ' + new Date);
+    this.consol = text + ' ' + new Date;
+  }
+
   /*SINCRONIZACION---------------------------------------------------------*/
   traerEncuestaServidor() {
-    //setTimeout(() => { this.traerEncuestaServidor(); }, 3700000);
-    setTimeout(() => { this.traerEncuestaServidor(); }, 60000 * 121);
+    setTimeout(() => { this.traerEncuestaServidor(); }, 60000 * 4);
+    this.getEncuesta()
+    //setTimeout(() => { this.traerEncuestaServidor(); }, 60000 * 121);
     if (this.conectado) {
-      Promise.all([this.http.getJsonData()])
-        .then(() => {
-          this.getEncuesta();
+      this.loguear('traerEncuestaServidor() ' + new Date)
+      this.http.getJsonData()
+        .then(res => {
+          this.loguear('Encuesta recibida.')
+          //this.loguear(res)
+          this.getEncuesta()
+        })
+        .catch(e => {
+          this.loguear(e)
+          this.loguear('Fallo búsqueda encuesta.')
         })
     } else {
-      console.error('No conectado - No busco.');
+      this.loguear('No conectado - No busco.');
     }
   }
 
   elDemonio() {
-    console.log('Pasando por el demonio');
-    //setTimeout(() => { this.elDemonio(); }, 3600000);
-    setTimeout(() => { this.elDemonio(); }, 60000 * 60);
+    setTimeout(() => { this.elDemonio(); }, 60000 * 2);
+    //setTimeout(() => { this.elDemonio(); }, 60000 * 60);
     if (this.conectado) {
       this.sincronizar();
     } else {
@@ -110,7 +131,6 @@ export class HomePage {
   }
 
   sincronizar() {
-    //this.consol += 'Sincronizando -|-'
     if (this.conectado) {
       this.opcionesConImagen = [];
       this.opcionesSinImagen = [];
@@ -129,15 +149,21 @@ export class HomePage {
   sincronizarBase() {
     this.sqlite.count()
       .then(res => {
-        if (res > 0 && this.conectado) {
-          this.sqlite.sincroniza()
-            .then((res) => {
-              //this.consol += 'enviaUnaRespuesta -|-'
-              this.sincronizarBase();
-            })
+        if (this.conectado) {
+          if (res > 0) {
+            this.loguear('sincronizar enviando respuesta')
+            this.sqlite.sincroniza()
+              .then((res) => {
+                this.loguear('Respuesta de envío')
+                this.sincronizarBase();
+              })
+          } else {
+            this.loguear('sincronizar finalizado')
+            this.cargaTemplate1();
+          }
         } else {
           //this.consol += 'baseVacia/Desconectado -|-';
-          console.log('Desconectado/baseVacia - No-Sincronizando');
+          this.loguear('Desconectado - No-Sincronizando');
           this.cargaTemplate1();
         }
       })
@@ -159,27 +185,37 @@ export class HomePage {
 
   /*LOGICA-----------------------------------------------------------------*/
   finalizaEncuesta() {
-    let resp = JSON.stringify(this.aGuardar);
-    //this.consol += 'guardaRespuesta -|-';
+    setTimeout(() => { this.cargaTemplate1(); }, 2000);
+    this.loguear('Guardando respuesta...')
     var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "100%";
     pregCont.style.fontSize = "17em";
     pregCont.innerHTML = 'GRACIAS';
+    let resp = JSON.stringify(this.aGuardar);
     this.opcionesConImagen = [];
     this.opcionesSinImagen = [];
     this.conImagenes = true;
-    //dejar el gracias en 15 segundos
-    setTimeout(() => { this.cargaTemplate1(); }, 10000);
-    this.sqlite.insertRespuesta(resp);
+    this.sqlite.insertRespuesta(resp)
+      .then(res => {
+        this.loguear('Respuesta guardada')
+      })
   }
 
   cargaTemplate1() {
-    this.clean();
+    this.opcionesConImagen = [];
+    this.opcionesSinImagen = [];
+    this.aGuardar = {
+      foto: '',
+      fecha: '',
+      idDispositivo: '',
+      idEncuesta: '',
+      opciones: []
+    };
     this.preguntaInicial = this.primerPregunta();
-    var opcionesPregunta1 = this.opcionesPregunta(this.preguntaInicial);
+    let opcionesPregunta1 = this.opcionesPregunta(this.preguntaInicial);
     let opcContainer = document.getElementById('opcionesContainer');
+    let pregCont = document.getElementById("preguntaContainer");
     opcContainer.removeAttribute('hidden');
-    var pregCont = document.getElementById("preguntaContainer");
     pregCont.style.height = "35%";
     pregCont.style.fontSize = "6.5em";
     pregCont.innerHTML = this.preguntaInicial.pregunta;
@@ -188,17 +224,19 @@ export class HomePage {
     } else {
       this.opcionesInicialesSI = opcionesPregunta1;
     }
+    this.loguear('Comenzar...')
   }
 
   preguntaSgte(opcion) {
-    this.camera.takePicture(this.pictureOpts)
+    this.loguear('Continuar...')
+    this.aGuardar.opciones[this.aGuardar.opciones.length] = opcion.id;
     if (opcion.preguntasiguiente != null) {
-      var preguntaActual = this.preguntaPorId(opcion.preguntasiguiente);
-      var opcionesPreguntaActual = this.opcionesPregunta(preguntaActual);
+      this.camera.takePicture(this.pictureOpts)
       this.opcionesConImagen = [];
       this.opcionesSinImagen = [];
-      var pregCont = document.getElementById("preguntaContainer");
-
+      let preguntaActual = this.preguntaPorId(opcion.preguntasiguiente);
+      let opcionesPreguntaActual = this.opcionesPregunta(preguntaActual);
+      let pregCont = document.getElementById("preguntaContainer");
       if (preguntaActual.pregunta != null) {
         pregCont.style.height = "35%";
         pregCont.style.fontSize = "6.5em";
@@ -213,10 +251,12 @@ export class HomePage {
         this.opcionesSinImagen = opcionesPreguntaActual;
       }
     } else {
+      this.camera.takePicture(this.pictureOpts)
       this.finalizaEncuesta()
     }
+
     this.continuara();
-    this.aGuardar.opciones[this.aGuardar.opciones.length] = opcion.id;
+    
   }
 
   setAGuardar(opcion) {
@@ -225,19 +265,6 @@ export class HomePage {
     let myFormattedDate = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + '-' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
     this.aGuardar.fecha = myFormattedDate;
     this.aGuardar.idEncuesta = this.encuesta.json.encuesta;
-  }
-
-  clean() {
-    this.opcionesConImagen = [];
-    this.opcionesSinImagen = [];
-    this.aGuardar = {
-      foto: '',
-      fecha: '',
-      idDispositivo: '',
-      idEncuesta: '',
-      opciones: []
-    };
-
   }
 
   /*FIN LOGICA-------------------------------------------------------------*/
@@ -250,7 +277,7 @@ export class HomePage {
       objeto => {
         return objeto;
       },
-      err => console.log(err))
+      err => this.loguear(err))
       .filter(
       objeto2 => {
         for (let id of pregunta.opciones) {
@@ -262,19 +289,19 @@ export class HomePage {
           }
         }
       },
-      err => console.log(err)).sort(function (a, b) { return a.orden - b.orden });
+      err => this.loguear(err)).sort(function (a, b) { return a.orden - b.orden });
   }
 
   preguntaPorId(paramId: number) {
     return JSON.parse(JSON.stringify(this.encuesta.json.preguntas))
-      .map(objeto => { return objeto; }, err => console.log(err))
-      .filter(objeto2 => { return objeto2.id == paramId; }, err => console.log(err))[0];
+      .map(objeto => { return objeto; }, err => this.loguear(err))
+      .filter(objeto2 => { return objeto2.id == paramId; }, err => this.loguear(err))[0];
   }
 
   primerPregunta() {
     return JSON.parse(JSON.stringify(this.encuesta.json.preguntas))
-      .map(objeto => { return objeto; }, err => console.log(err))
-      .filter(objeto2 => { return objeto2.inicial == true; }, err => console.log(err))[0];
+      .map(objeto => { return objeto; }, err => this.loguear(err))
+      .filter(objeto2 => { return objeto2.inicial == true; }, err => this.loguear(err))[0];
     //Ejemplo: {id: 1, pregunta: "Como...?", opciones: Array[3], inicial: true}
   }
 
@@ -332,21 +359,18 @@ export class HomePage {
         if (response2.length > 0) {
           this.nativeStorage.getItem('encuesta').then(
             data => {
-              console.log('Success home getEncuesta() getItem():');
-              console.log(data);
+              this.loguear('-----Encuesta local encontrada');
               this.encuesta = JSON.parse(JSON.stringify(data));
               this.preguntas = this.encuesta.json.preguntas;
               this.preguntas.sort(function (a, b) { return a.orden - b.orden });
               this.opciones = this.encuesta.json.opciones;
               this.opciones.sort(function (a, b) { return a.orden - b.orden });
-              this.cargaTemplate1();
-            },
-            error => {
-              console.error('Fail home getEncuesta():');
-              console.error(JSON.parse(error))
+              this.cargaTemplate1()
+              return data;
+
             });
         } else {
-          console.error('Fail home getEncuesta(): storage vacío');
+          this.loguear('Storage vacío');
         }
       });
   }
@@ -354,7 +378,7 @@ export class HomePage {
 
   /*CAMERA-----------------------------------------------------------------*/
   sacaFoto(opcion) {
-    this.setAGuardar(opcion);
+    
     if (opcion.preguntasiguiente != 'null') {
       this.opcionesInicialesCI = [];
       this.opcionesInicialesSI = [];
@@ -366,10 +390,10 @@ export class HomePage {
     }
     this.camera.takePicture(this.pictureOpts).then((imageData) => {
       this.aGuardar.foto = 'data:image/jpeg;base64,' + imageData;
-
     }, (err) => {
-      console.log('Fail take: ' + err);
+      this.loguear(err);
     });
+    this.setAGuardar(opcion);
   }
 
   /*FIN CAMERA-------------------------------------------------------------*/

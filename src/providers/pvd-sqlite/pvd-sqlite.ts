@@ -31,15 +31,12 @@ export class PvdSqliteProvider {
   }
 
   insertRespuesta(respuesta) {
-    console.log('respuesta en el servicio');
-    console.log(respuesta);
     let insertQuery = 'INSERT INTO respuestas(respuesta) VALUES(?)';
     return this.dbTapuy.executeSql(insertQuery, [respuesta]).then(res => {
       if (res.rowsAffected == 0) {
         Promise.reject('**ERR - INSERT RESPUESTA**');
       }
-      console.log('inserto en base:');
-      console.log(res);
+      return res.rowsAffected
     })
   }
 
@@ -50,21 +47,17 @@ export class PvdSqliteProvider {
         return respuesta;
       },
       err=>{
-        console.log('error getPrimerRespuesta')
-        console.log(err);
+        return err
       })
   }
 
   enviarRespuesta(respuesta) {
     return this.http.callPost(respuesta)
       .then(llego => {
-        //console.log('respuesta servidor:');
-        console.log(llego.respuesta);
         return llego;
       },
       err=>{
-        console.log('error enviarRespuesta')
-        console.log(err);
+        return err
       })
   }
 
@@ -72,28 +65,24 @@ export class PvdSqliteProvider {
     let deleteQuery = 'DELETE FROM respuestas WHERE idRespuesta in (SELECT MIN(idRespuesta) FROM respuestas)';
     return this.dbTapuy.executeSql(deleteQuery, [])
       .then(res => {
-        //console.log('respuestas borradas');
-        //console.log(res.rowsAffected);
-        console.log('Borro '+res.rowsAffected+ ' respuesta.');
         return res;
       },
       err=>{
-        console.log('error deletePrimerRespuesta')
-        console.log(err);
+        return err
       })
   }
 
   sincroniza() {
     let countQuery = 'SELECT COUNT(idRespuesta) cant FROM respuestas';
     let mando = false;
-    return Promise.all([this.getPrimerRespuesta()])
+    return this.getPrimerRespuesta()
       .then(respuesta => {
-        return Promise.all([this.enviarRespuesta(respuesta[0].rows.item(0)), this.dbTapuy.executeSql(countQuery, [])])
-          .then(llego => {
-            if (llego[0].respuesta) {
+        return this.enviarRespuesta(respuesta.rows.item(0))
+          .then(res => {
+            if (res.respuesta) {
               this.deletePrimerRespuesta()
             }
-            return llego[1].rows.item(0).cant;
+            return res
           })
       })
   }

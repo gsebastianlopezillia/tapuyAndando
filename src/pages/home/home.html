@@ -10,6 +10,12 @@
         <button item-left id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
         <!--button item-right id="btnDerecho" color="light" ion-button large item-right (click)="sincronizarBase()">SINC </button-->
     </div>
+    <!--ion-item>
+        <ion-textarea [value]="consol" ([ngModel])="consol"></ion-textarea>
+        <button item-right id="btnDerecho" color="light" ion-button large item-right (click)="borraTextArea()">CLEAN </button>
+
+    </ion-item-->
+    <!--img src="img/imagenencuesta.jpg" style="heigth: 100%; width:100%" *ngIf="sincronizando"-->
     <div id="invisibe" hidden="true">
         <ion-item>
             <button item-right id="btnDerecho" ion-button clear small (click)="traerEncuestaServidor()">Cargar</button>
@@ -21,10 +27,13 @@
     <div text-center id="preguntaContainer" style="font-family: Arial, Helvetica, sans-serif; font-size: 5em"></div>
     <div id="opcionesContainer" text-center>
         <ion-list>
+
             <ion-item *ngFor="let opsi of opcionesInicialesSI">
                 <h3 (click)="sacaFoto(opsi)">{{opsi.opcion}}</h3>
             </ion-item>
+
             <img *ngFor="let opci of opcionesInicialesCI" src="{{opci.imagen}}" id="{{opci.id}}" (click)="sacaFoto(opci)" />
+
             <ion-item *ngFor="let opsi of opcionesSinImagen">
                 <br/>
                 <button color="amarillito" ion-button full round (click)="preguntaSgte(opsi)" large icon-left>
@@ -33,10 +42,12 @@
                 </button>
                 <br/>
             </ion-item>
+
             <img *ngFor="let opci of opcionesConImagen" src="{{opci.imagen}}" id="{{opci.id}}" (click)="preguntaSgte(opci)" />
+
         </ion-list>
     </div>
-    <!--div>
-        <ion-input type="text" [value]="consol" ([ngModel])="consol"></ion-input>
-    </div-->
+    <div text-center>
+        {{consol}}
+    </div>
 </ion-content>
