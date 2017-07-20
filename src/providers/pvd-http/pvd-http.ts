@@ -9,8 +9,8 @@ import { PvdStorageProvider } from '../../providers/pvd-storage/pvd-storage';
 @Injectable()
 export class PvdHttpProvider {
 
-  //urlBase = 'http://tapuy.cloud.runaid.com.ar/device/';
-  urlBase = 'http://192.168.0.54:8080/tapuy/device/';
+  urlBase = 'http://tapuy.cloud.runaid.com.ar/device/';
+  //urlBase = 'http://192.168.0.54:8080/tapuy/device/';
 
   constructor(public http: Http,
     public pvdStorage: PvdStorageProvider,

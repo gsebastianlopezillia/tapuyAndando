@@ -29,7 +29,8 @@ export class HomePage {
   version: any = '3.0.1'
 
   timeOutPrimerEncuesta: any = (60000 * 2)
-  timeOutSincronizar: any = (60000 * 3)
+  timeOutSincronizar: any = (60000 * 30)
+  timeOutEncuestaNueva: any = (60000 * 60)
 
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
@@ -116,6 +117,23 @@ export class HomePage {
     setTimeout(() => {this.sincro()}, this.timeOutSincronizar)
     if(this.conectado){
       this.navCtrl.push(SincroPage)
+    }
+  }
+
+  pedirEncuestaNueva() {
+    setTimeout(()=>{this.pedirEncuestaNueva()}, this.timeOutEncuestaNueva)
+    if (this.conectado) {
+      this.http.getJsonData()
+        .then(res => {
+          this.loguear(res)
+          this.getEncuesta()
+        })
+        .catch(e => {
+          this.loguear(e)
+          this.loguear('Fallo búsqueda encuesta.')
+        })
+    } else {
+      this.loguear('No conectado - No busco.');
     }
   }
 
