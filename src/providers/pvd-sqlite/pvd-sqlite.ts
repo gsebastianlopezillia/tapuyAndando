@@ -44,10 +44,9 @@ export class PvdSqliteProvider {
   }
 
   getPrimerRespuesta() {
-    let postQuery2 = "SELECT * FROM respuestas WHERE idRespuesta IN (SELECT MIN(idRespuesta) FROM respuestas)";
+    let postQuery2 = "SELECT respuesta FROM respuestas WHERE idRespuesta IN (SELECT MIN(idRespuesta) FROM respuestas)";
     return this.dbTapuy.executeSql(postQuery2, [])
       .then(respuesta => {
-        console.log(respuesta.rows.item(0))
         return respuesta;
       },
       err=>{
@@ -80,7 +79,7 @@ export class PvdSqliteProvider {
     let mando = false;
     return this.getPrimerRespuesta()
       .then(respuesta => {
-        return this.enviarRespuesta(respuesta.rows.item(0).respuesta)
+        return this.enviarRespuesta(respuesta.rows.item(0))
           .then(res => {
             if (res.respuesta) {
               this.deletePrimerRespuesta()
@@ -94,7 +93,6 @@ export class PvdSqliteProvider {
     let countQuery = 'SELECT COUNT(idRespuesta) cant FROM respuestas';
     return this.dbTapuy.executeSql(countQuery, [])
     .then(res =>{
-      console.log(res.rows.item(0).cant)
       return res.rows.item(0).cant})
   }
 }

@@ -28,7 +28,7 @@ export class HomePage {
   //preguntaSgtePage: PreguntaSgtePage
 
   timeOutPrimerEncuesta: any = (60000 * 2)
-  timeOutSincronizar: any = (60000 * 5)
+  timeOutSincronizar: any = (60000 * 1)
 
   preguntaInicial: any = '';
   opcionesIniciales: any = [];

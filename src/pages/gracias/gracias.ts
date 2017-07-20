@@ -16,7 +16,7 @@ import { PvdSqliteProvider } from '../../providers/pvd-sqlite/pvd-sqlite'
   providers: [PvdSqliteProvider],
 })
 export class GraciasPage {
-  timeOutGracias: any = 10000;
+  timeOutGracias: any = 5000;
   aGuardar: any = {
     foto: '',
     fecha: '',
@@ -33,15 +33,17 @@ export class GraciasPage {
 
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad GraciasPage');
+  loguear(log: any) {
+    console.log(log + ' ' + new Date);
+    console.log(log)
+    //this.consol = text + ' ' + new Date;
+  }
 
+  ionViewDidLoad() {
     setTimeout(() => {
       let resp = JSON.stringify(this.aGuardar);
       this.sqlite.insertRespuesta(resp)
         .then(res => {
-          console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-          console.log(res)
           this.aGuardar = {
             foto: '',
             fecha: '',
@@ -51,10 +53,14 @@ export class GraciasPage {
           };
         })
         .catch(e => {
-          console.log(e)
+          this.loguear(e)
         })
     }, 4000)
-    setTimeout(() => { this.navCtrl.popAll(); }, this.timeOutGracias)
+    setTimeout(() => {
+      if(this.navCtrl.getActive().name == 'PreguntaPage'){
+        this.navCtrl.popAll()
+      }
+    }, this.timeOutGracias)
   }
 
 

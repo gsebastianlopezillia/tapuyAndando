@@ -57,12 +57,8 @@ export class SincroPage {
   }
 
   comprobarBase() {
-    this.loguear('Comprobar base')
     this.sqlite.count()
       .then(res => {
-        this.loguear('count de sincro')
-        this.loguear(res)
-
         if (res == 0) {
           this.navCtrl.popAll()
         } else {

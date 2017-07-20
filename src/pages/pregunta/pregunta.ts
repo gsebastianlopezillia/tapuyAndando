@@ -35,13 +35,15 @@ export class PreguntaPage {
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams) {
-      this.pregunta = this.navParams.get('pregunta')
-      this.opciones = this.navParams.get('opciones')
-      this.aGuardar = this.navParams.get('aGuardar')
-      this.encuesta = this.navParams.get('encuesta')
-
-      setTimeout(()=>{this.navCtrl.popAll()}, this.timeOutPregunta)
-
+    this.pregunta = this.navParams.get('pregunta')
+    this.opciones = this.navParams.get('opciones')
+    this.aGuardar = this.navParams.get('aGuardar')
+    this.encuesta = this.navParams.get('encuesta')
+    setTimeout(() => {
+      if (this.navCtrl.getActive().name == 'PreguntaPage') {
+        this.navCtrl.popAll()
+      }
+    }, this.timeOutPregunta)
   }
 
   loguear(log: any) {
