@@ -28,7 +28,7 @@ export class HomePage {
   //preguntaSgtePage: PreguntaSgtePage
 
   timeOutPrimerEncuesta: any = (60000 * 2)
-  timeOutSincronizar: any = (60000)
+  timeOutSincronizar: any = (60000 * 5)
 
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
@@ -123,7 +123,7 @@ export class HomePage {
   /*LOGICA-----------------------------------------------------------------*/
   preguntaSgte(opcion) {
     this.aGuardar.opciones.push(opcion.id)
-    if (opcion.preguntasiguiente != '') {
+    if (opcion.preguntasiguiente != null) {
       let preguntaSiguiente = this.preguntaPorId(opcion.preguntasiguiente)
       let opcionesSiguientes = this.opcionesPregunta(preguntaSiguiente)
       this.navCtrl.push(PreguntaPage, {
@@ -275,7 +275,6 @@ export class HomePage {
       this.loguear(err);
     });
     this.setAGuardar()
-    this.loguear(this.aGuardar)
   }
 
   /*FIN CAMERA-------------------------------------------------------------*/
