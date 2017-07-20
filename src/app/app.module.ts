@@ -20,10 +20,15 @@ import { PvdHttpProvider } from '../providers/pvd-http/pvd-http';
 import { PvdStorageProvider } from '../providers/pvd-storage/pvd-storage';
 import { PvdSqliteProvider } from '../providers/pvd-sqlite/pvd-sqlite';
 
+import { PreguntaSgtePage } from '../pages/pregunta-sgte/pregunta-sgte'
+import { GraciasPage } from '../pages/gracias/gracias'
+
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
+    PreguntaSgtePage,
+    GraciasPage
   ],
   imports: [
     BrowserModule,
@@ -33,7 +38,9 @@ import { PvdSqliteProvider } from '../providers/pvd-sqlite/pvd-sqlite';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    HomePage,
+    PreguntaSgtePage,
+    GraciasPage
   ],
   providers: [
     StatusBar,
@@ -49,7 +56,7 @@ import { PvdSqliteProvider } from '../providers/pvd-sqlite/pvd-sqlite';
     PvdHttpProvider,
     PvdStorageProvider,
     PvdSqliteProvider,
-    Network,
+    Network
   ]
 })
 export class AppModule {}
