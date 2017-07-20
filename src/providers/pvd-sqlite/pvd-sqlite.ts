@@ -18,7 +18,7 @@ export class PvdSqliteProvider {
   constructor(public http: PvdHttpProvider, private sqlite: SQLite) {
     this.sqlite.create(this.options)
       .then((db: SQLiteObject) => {
-        console.log('********Inicializa sqlite*********');
+        //console.log('********Inicializa sqlite*********');
         this.dbTapuy = db;
       })
       .then(() => {
@@ -29,7 +29,7 @@ export class PvdSqliteProvider {
   crearBase() {
     return this.dbTapuy.executeSql(this.queryCreateTableRespuestas, [])
       .then(() => {//crea tabla respuestas
-        return console.log('**Tabla creada con éxito**');
+        return true //console.log('**Tabla creada con éxito**');
       })
   }
 

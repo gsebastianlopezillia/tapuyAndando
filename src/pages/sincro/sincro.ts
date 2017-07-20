@@ -39,7 +39,7 @@ export class SincroPage {
       this.conectado = false
       this.loguear('Device sin conexión')
     }
-    //setTimeout(()=>{this.comprobarBase()}, 3000)
+    setTimeout(()=>{this.comprobarBase()}, 3000)
 
   }
 
