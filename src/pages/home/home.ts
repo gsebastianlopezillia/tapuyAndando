@@ -8,18 +8,18 @@ import { Network } from '@ionic-native/network'
 import { PvdHttpProvider } from '../../providers/pvd-http/pvd-http'
 import { PvdCameraProvider } from '../../providers/pvd-camera/pvd-camera'
 import { PvdStorageProvider } from '../../providers/pvd-storage/pvd-storage'
-import { PvdSqliteProvider } from '../../providers/pvd-sqlite/pvd-sqlite'
 import { NgModel } from '@angular/forms'
 
-import { PreguntaSgtePage } from '../pregunta-sgte/pregunta-sgte'
 import { GraciasPage } from '../gracias/gracias'
+import { PreguntaPage } from '../pregunta/pregunta'
+import { SincroPage } from '../sincro/sincro'
 
 declare let KioskPlugin: any
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [PvdHttpProvider, PvdCameraProvider, PvdStorageProvider, PvdSqliteProvider, NgModel]
+  providers: [PvdHttpProvider, PvdCameraProvider, PvdStorageProvider, NgModel]
 
 })
 
@@ -28,6 +28,7 @@ export class HomePage {
   //preguntaSgtePage: PreguntaSgtePage
 
   timeOutPrimerEncuesta: any = (60000 * 2)
+  timeOutSincronizar: any = (60000)
 
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
@@ -61,7 +62,6 @@ export class HomePage {
     public navParams: NavParams,
     public platform: Platform,
     public http: PvdHttpProvider,
-    public sqlite: PvdSqliteProvider,
     public storage: PvdStorageProvider,
     public nativeStorage: NativeStorage,
     public camera: CameraPreview,
@@ -80,9 +80,9 @@ export class HomePage {
         this.conectado = false
         this.loguear('Device sin conexión')
       }
-      this.uuid = this.device.uuid;
-      this.getEncuesta();
-
+      this.uuid = this.device.uuid
+      this.getEncuesta()
+      setTimeout(() => {this.sincro()}, this.timeOutSincronizar)
     });
   }
 
@@ -111,29 +111,48 @@ export class HomePage {
     }
   }
 
+  sincro(){
+    setTimeout(() => {this.sincro()}, this.timeOutSincronizar)
+    if(this.conectado){
+      this.navCtrl.push(SincroPage)
+    }
+  }
 
   /*FIN SINCRONIZACION-----------------------------------------------------*/
 
   /*LOGICA-----------------------------------------------------------------*/
   preguntaSgte(opcion) {
+    this.aGuardar.opciones.push(opcion.id)
     if (opcion.preguntasiguiente != '') {
       let preguntaSiguiente = this.preguntaPorId(opcion.preguntasiguiente)
       let opcionesSiguientes = this.opcionesPregunta(preguntaSiguiente)
-
-      this.navCtrl.push('PreguntaSgtePage',
-        {
-          pregunta: JSON.stringify(preguntaSiguiente),
-          opciones: JSON.stringify(opcionesSiguientes),
-          aGuardar: JSON.stringify(this.aGuardar)
-        }
-      );
-
-
+      this.navCtrl.push(PreguntaPage, {
+        pregunta: preguntaSiguiente,
+        opciones: opcionesSiguientes,
+        aGuardar: this.aGuardar,
+        encuesta: this.encuesta
+      })
+        .then(() => {
+          this.aGuardar = {
+            foto: '',
+            fecha: '',
+            idDispositivo: '',
+            idEncuesta: '',
+            opciones: []
+          };
+        })
     } else {
-      this.navCtrl.push(GraciasPage);
-      //this.sqlite.insertRespuesta(this.aGuardar);
+      this.navCtrl.push(GraciasPage, { aGuardar: this.aGuardar })
+        .then(() => {
+          this.aGuardar = {
+            foto: '',
+            fecha: '',
+            idDispositivo: '',
+            idEncuesta: '',
+            opciones: []
+          };
+        })
     }
-
   }
 
   setAGuardar() {
@@ -237,10 +256,6 @@ export class HomePage {
               this.encuesta = data.json
               this.preguntaInicial = this.primerPregunta()
               this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
-              this.loguear(this.encuesta)
-              this.loguear(this.preguntaInicial)
-              this.loguear(this.opcionesIniciales)
-              //encuesta recuperada
               return data;
             });
         } else {
@@ -260,10 +275,11 @@ export class HomePage {
       this.loguear(err);
     });
     this.setAGuardar()
-    this.aGuardar.opciones.push(opcion.id)
     this.loguear(this.aGuardar)
   }
 
   /*FIN CAMERA-------------------------------------------------------------*/
+
+  
 }
 

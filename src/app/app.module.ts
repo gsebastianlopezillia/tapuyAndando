@@ -20,15 +20,17 @@ import { PvdHttpProvider } from '../providers/pvd-http/pvd-http';
 import { PvdStorageProvider } from '../providers/pvd-storage/pvd-storage';
 import { PvdSqliteProvider } from '../providers/pvd-sqlite/pvd-sqlite';
 
-import { PreguntaSgtePage } from '../pages/pregunta-sgte/pregunta-sgte'
 import { GraciasPage } from '../pages/gracias/gracias'
+import { PreguntaPage } from '../pages/pregunta/pregunta'
+import { SincroPage } from '../pages/sincro/sincro'
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    PreguntaSgtePage,
-    GraciasPage
+    GraciasPage,
+    PreguntaPage,
+    SincroPage
   ],
   imports: [
     BrowserModule,
@@ -39,8 +41,9 @@ import { GraciasPage } from '../pages/gracias/gracias'
   entryComponents: [
     MyApp,
     HomePage,
-    PreguntaSgtePage,
-    GraciasPage
+    GraciasPage,
+    PreguntaPage,
+    SincroPage
   ],
   providers: [
     StatusBar,

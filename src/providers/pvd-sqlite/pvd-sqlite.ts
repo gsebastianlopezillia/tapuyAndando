@@ -21,6 +21,9 @@ export class PvdSqliteProvider {
         console.log('********Inicializa sqlite*********');
         this.dbTapuy = db;
       })
+      .then(() => {
+        this.crearBase();
+      })
   }
 
   crearBase() {
@@ -44,6 +47,7 @@ export class PvdSqliteProvider {
     let postQuery2 = "SELECT * FROM respuestas WHERE idRespuesta IN (SELECT MIN(idRespuesta) FROM respuestas)";
     return this.dbTapuy.executeSql(postQuery2, [])
       .then(respuesta => {
+        console.log(respuesta.rows.item(0))
         return respuesta;
       },
       err=>{
@@ -73,11 +77,10 @@ export class PvdSqliteProvider {
   }
 
   sincroniza() {
-    let countQuery = 'SELECT COUNT(idRespuesta) cant FROM respuestas';
     let mando = false;
     return this.getPrimerRespuesta()
       .then(respuesta => {
-        return this.enviarRespuesta(respuesta.rows.item(0))
+        return this.enviarRespuesta(respuesta.rows.item(0).respuesta)
           .then(res => {
             if (res.respuesta) {
               this.deletePrimerRespuesta()
@@ -90,6 +93,8 @@ export class PvdSqliteProvider {
   count(){
     let countQuery = 'SELECT COUNT(idRespuesta) cant FROM respuestas';
     return this.dbTapuy.executeSql(countQuery, [])
-    .then(res =>{return res.rows.item(0).cant})
+    .then(res =>{
+      console.log(res.rows.item(0).cant)
+      return res.rows.item(0).cant})
   }
 }
