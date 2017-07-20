@@ -17,7 +17,7 @@ import { GraciasPage } from '../gracias/gracias'
 export class PreguntaPage {
 
 
-  timeOutPregunta: any = (30000)
+  timeOutPregunta: any = (45000)
 
   pregunta: any = '';
   opciones: any = [];

@@ -39,9 +39,7 @@ export class SincroPage {
       this.conectado = false
       this.loguear('Device sin conexión')
     }
-    //////////////
-    setTimeout(()=>{this.comprobarBase()}, 2000)
-
+    //setTimeout(()=>{this.comprobarBase()}, 3000)
 
   }
 
@@ -52,8 +50,7 @@ export class SincroPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad SincroPage');
-    setTimeout(() => { this.comprobarBase }, 2000)
+    setTimeout(() => { this.comprobarBase }, 3000)
   }
 
   comprobarBase() {
@@ -68,11 +65,14 @@ export class SincroPage {
   }
 
   mandar() {
-    this.sqlite.sincroniza()
+    if(this.conectado){
+      this.sqlite.sincroniza()
       .then(res => {
-        console.log('res de mandar')
-        console.log(res)
+        this.comprobarBase()
       })
+    }else{
+      this.navCtrl.popAll()
+    }
   }
 
 }
