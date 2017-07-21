@@ -35,7 +35,13 @@ export class GraciasPage {
   }
 
   ionViewDidLoad() {
-    setTimeout(()=>{this.navCtrl.popAll()},this.timeOutGracias)
+    setTimeout(() => {
+      this.navCtrl.popAll()
+      .then()
+      .catch(e => {
+        //this.loguear(e)
+      })
+    }, this.timeOutGracias)
     setTimeout(() => {
       let resp = JSON.stringify(this.aGuardar);
       this.sqlite.insertRespuesta(resp)
@@ -51,6 +57,10 @@ export class GraciasPage {
         .catch(e => {
           this.loguear(e)
           this.navCtrl.popAll()
+            .then()
+            .catch(e => {
+              //this.loguear(e)
+            })
         })
     }, 4000)
   }

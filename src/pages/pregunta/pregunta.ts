@@ -42,6 +42,10 @@ export class PreguntaPage {
     setTimeout(() => {
       if (this.navCtrl.getActive().name == 'PreguntaPage') {
         this.navCtrl.popAll()
+          .then()
+          .catch(e => {
+            //this.loguear(e)
+          })
       }
     }, this.timeOutPregunta)
   }

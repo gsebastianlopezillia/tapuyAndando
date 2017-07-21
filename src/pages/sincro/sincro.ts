@@ -39,7 +39,7 @@ export class SincroPage {
       this.conectado = false
       this.loguear('Device sin conexión')
     }
-    setTimeout(()=>{this.comprobarBase()}, 3000)
+    setTimeout(() => { this.comprobarBase() }, 3000)
 
   }
 
@@ -58,6 +58,10 @@ export class SincroPage {
       .then(res => {
         if (res == 0) {
           this.navCtrl.popAll()
+            .then()
+            .catch(e => {
+              //this.loguear(e)
+            })
         } else {
           this.mandar()
         }
@@ -65,13 +69,17 @@ export class SincroPage {
   }
 
   mandar() {
-    if(this.conectado){
+    if (this.conectado) {
       this.sqlite.sincroniza()
-      .then(res => {
-        this.comprobarBase()
-      })
-    }else{
+        .then(res => {
+          this.comprobarBase()
+        })
+    } else {
       this.navCtrl.popAll()
+        .then()
+        .catch(e => {
+          //this.loguear(e)
+        })
     }
   }
 
