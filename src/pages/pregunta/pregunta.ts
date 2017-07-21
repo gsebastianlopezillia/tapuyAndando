@@ -32,7 +32,6 @@ export class PreguntaPage {
     opciones: []
   };
 
-
   constructor(public navCtrl: NavController,
     public navParams: NavParams) {
     this.pregunta = this.navParams.get('pregunta')
@@ -41,7 +40,7 @@ export class PreguntaPage {
     this.encuesta = this.navParams.get('encuesta')
     setTimeout(() => {
       if (this.navCtrl.getActive().name == 'PreguntaPage') {
-        this.navCtrl.popAll()
+        this.navCtrl.popToRoot()
           .then()
           .catch(e => {
             //this.loguear(e)
@@ -52,7 +51,7 @@ export class PreguntaPage {
 
   loguear(log: any) {
     console.log(log + ' ' + new Date);
-    console.log(log)
+    //console.log(log)
     //this.consol = text + ' ' + new Date;
   }
 

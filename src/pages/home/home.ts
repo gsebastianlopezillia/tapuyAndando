@@ -28,9 +28,9 @@ export class HomePage {
   //preguntaSgtePage: PreguntaSgtePage
   version: any = '3.0.1'
 
-  timeOutPrimerEncuesta: any = (30000)
-  timeOutSincronizar: any = (120000)
-  timeOutEncuestaNueva: any = (300000)
+  timeOutPrimerEncuesta: any = 30000
+  timeOutSincronizar: any = 900000
+  timeOutEncuestaNueva: any = 21600000
 
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
@@ -89,8 +89,8 @@ export class HomePage {
   }
 
   loguear(log: any) {
-    console.log(log + ' ' + new Date);
-    console.log(log)
+    console.log('----->'+log + ' ' + new Date);
+    //console.log(log)
     //this.consol = text + ' ' + new Date;
   }
 
@@ -121,6 +121,7 @@ export class HomePage {
   }
 
   pedirEncuestaNueva() {
+    this.loguear('Pidiendo nueva encuesta')
     setTimeout(()=>{this.pedirEncuestaNueva()}, this.timeOutEncuestaNueva)
     if (this.conectado) {
       this.http.getJsonData()

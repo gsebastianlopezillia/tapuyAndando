@@ -57,7 +57,7 @@ export class SincroPage {
     this.sqlite.count()
       .then(res => {
         if (res == 0) {
-          this.navCtrl.popAll()
+          this.navCtrl.popToRoot()
             .then()
             .catch(e => {
               //this.loguear(e)
@@ -75,7 +75,7 @@ export class SincroPage {
           this.comprobarBase()
         })
     } else {
-      this.navCtrl.popAll()
+      this.navCtrl.popToRoot()
         .then()
         .catch(e => {
           //this.loguear(e)

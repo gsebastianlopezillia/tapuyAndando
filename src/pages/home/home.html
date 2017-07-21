@@ -5,7 +5,7 @@
         </ion-title>
     </ion-navbar>
 </ion-header>
-<ion-content padding text-center>
+<ion-content padding text-center class="Absolute-Center">
 
     <div id="botonera" text-right>
         <button id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
@@ -27,7 +27,7 @@
         </div>
         <div *ngIf="opcionesIniciales != []">
             <ion-list *ngIf="opcionesIniciales[0].imagen != ''">
-                <img *ngFor="let opcion of opcionesIniciales" src="{{opcion.imagen}}" id="{{opcion.id}}" (click)="sacaFoto(opcion)" />
+                <img *ngFor="let opcion of opcionesIniciales" src="{{opcion.imagen}}" (click)="sacaFoto(opcion)" round/>
             </ion-list>
 
             <ion-list *ngIf="opcionesIniciales[0].imagen == ''">

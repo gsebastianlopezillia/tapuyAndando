@@ -1,24 +1,22 @@
-<ion-content padding>
-    <div *ngIf="pregunta != ''">
+<ion-content padding class="center">
+    <div *ngIf="pregunta != ''" class="center">
         <div *ngIf="pregunta.pregunta != ''">
             <div text-center id="divPregunta" style="font-family: Arial, Helvetica, sans-serif; font-size: 6em">
                 {{pregunta.pregunta}}
             </div>
         </div>
-        <div *ngIf="opciones != []">
-            <ion-list *ngIf="opciones[0].imagen != ''">
+        <div *ngIf="opciones != []" class="center">
+            <ion-list *ngIf="opciones[0].imagen != ''" class="center">
                 <img *ngFor="let opcion of opciones" src="{{opcion.imagen}}" id="{{opcion.id}}" (click)="preguntaSgte(opcion)" />
             </ion-list>
-
-            <ion-list *ngIf="opciones[0].imagen == ''">
+            <ion-list *ngIf="opciones[0].imagen == ''" class="center">
                 <ion-item *ngFor="let opcion of opciones" text-center id="divOpciones" style="font-family: Arial, Helvetica, sans-serif; font-size: 5em">
-                    <button color="amarillito" ion-button full round (click)="preguntaSgte(opcion)" large icon-left>
-                <ion-icon name="ion-load-b"></ion-icon>
-                <p style="font-family: Arial, Helvetica, sans-serif; font-size: 3em">{{opcion.opcion}}</p>
-            </button>
+                    <button color="amarillito" ion-button full round large icon-left (click)="preguntaSgte(opcion)" class="botonAmarillo">
+                        <ion-icon name="ion-load-b"></ion-icon>
+                        <p style="font-family: Arial, Helvetica, sans-serif; font-size: 3em">{{opcion.opcion}}</p>
+                    </button>
                 </ion-item>
             </ion-list>
         </div>
     </div>
-
 </ion-content>

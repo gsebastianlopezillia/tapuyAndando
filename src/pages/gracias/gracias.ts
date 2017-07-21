@@ -11,7 +11,7 @@ import { PvdSqliteProvider } from '../../providers/pvd-sqlite/pvd-sqlite'
 })
 
 export class GraciasPage {
-  timeOutGracias: any = 5000;
+  timeOutGracias: any = 10000;
   aGuardar: any = {
     foto: '',
     fecha: '',
@@ -36,7 +36,7 @@ export class GraciasPage {
 
   ionViewDidLoad() {
     setTimeout(() => {
-      this.navCtrl.popAll()
+      this.navCtrl.popToRoot()
       .then()
       .catch(e => {
         //this.loguear(e)
@@ -56,7 +56,7 @@ export class GraciasPage {
         })
         .catch(e => {
           this.loguear(e)
-          this.navCtrl.popAll()
+          this.navCtrl.popToRoot()
             .then()
             .catch(e => {
               //this.loguear(e)
