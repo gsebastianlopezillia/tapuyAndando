@@ -26,7 +26,7 @@ declare let KioskPlugin: any
 export class HomePage {
 
   //preguntaSgtePage: PreguntaSgtePage
-  version: any = '3.0.2'
+  version: any = '3.0.3'
 
   timeOutPrimerEncuesta: any = 30000
   timeOutSincronizar: any = 900000
