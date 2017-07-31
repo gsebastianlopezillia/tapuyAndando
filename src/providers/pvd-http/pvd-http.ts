@@ -9,8 +9,8 @@ import { PvdStorageProvider } from '../../providers/pvd-storage/pvd-storage';
 @Injectable()
 export class PvdHttpProvider {
 
-  urlBase = 'http://tapuy.cloud.runaid.com.ar/device/';
-  //urlBase = 'http://192.168.0.54:8080/tapuy/device/';
+  //urlBase = 'http://tapuy.cloud.runaid.com.ar/device/';
+  urlBase = 'http://192.168.0.54:8080/tapuy/device/';
 
   constructor(public http: Http,
     public pvdStorage: PvdStorageProvider,
@@ -21,32 +21,31 @@ export class PvdHttpProvider {
     return this.getJsonData2()
       .then((response) => {
         return this.pvdStorage.setEncuesta(response)
-          .then(res =>{
-            return 'Encuesta Guardada'
-          },
-          err =>{
-            return 'Fallo guardado encuesta'
-          })
+          .then(res =>{ return 'Encuesta Guardada' },
+          err =>{ return 'Fallo guardado encuesta' })
       })
-      .catch((error) => {
-        //console.error('Fail pvd-http getJsonData():');
-        //console.error(error);
-        return error
-      });
+      .catch((error) => { return error });
   }
 
   getJsonData2() {
-   console.log('pvd-http getJsonData2()->');
    console.log(this.urlBase + 'getEncuesta?idDispositivo=' + this.device.uuid + '&fechaModificacion=01/02/2017');
     return this.http
       .get(this.urlBase + 'getEncuesta?idDispositivo=' + this.device.uuid + '&fechaModificacion=01/02/2017')
       .map((response) => response.json())
-      //.timeout(30000)
       .toPromise();
   }
 
+  getVideo(idEncuesta) {
+   console.log(this.urlBase + 'verVideo?idencuesta='+idEncuesta);
+    return this.http
+      .get(this.urlBase + 'verVideo?idencuesta='+idEncuesta)
+      .toPromise()
+      .then( res =>{
+        return res
+      })
+  }
+
   callPost(objRespuesta) {
-    //console.log('pvd-http callPost()->');
     let url = this.urlBase + 'addFormulario';
     let body = JSON.stringify(objRespuesta);
     let headers = new Headers({ 'Content-Type': 'application/json' });

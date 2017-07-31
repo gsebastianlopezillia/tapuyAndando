@@ -4,45 +4,39 @@ import { Device } from '@ionic-native/device'
 import { NativeStorage } from '@ionic-native/native-storage'
 import { CameraPreview, CameraPreviewPictureOptions } from '@ionic-native/camera-preview'
 import { Network } from '@ionic-native/network'
-
 import { PvdHttpProvider } from '../../providers/pvd-http/pvd-http'
 import { PvdCameraProvider } from '../../providers/pvd-camera/pvd-camera'
 import { PvdStorageProvider } from '../../providers/pvd-storage/pvd-storage'
 import { NgModel } from '@angular/forms'
-
 import { GraciasPage } from '../gracias/gracias'
 import { PreguntaPage } from '../pregunta/pregunta'
 import { SincroPage } from '../sincro/sincro'
+import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer'
+import { File } from '@ionic-native/file'//https://github.com/dsgriffin/ionic-3-file-transfer-example
+import { VideoPlayer, VideoOptions, } from '@ionic-native/video-player'//https://www.techiediaries.com/ionic-video-playing/
 
+declare var cordova: any
 declare let KioskPlugin: any
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [PvdHttpProvider, PvdCameraProvider, PvdStorageProvider, NgModel]
-
+  providers: [PvdHttpProvider, PvdCameraProvider, PvdStorageProvider, NgModel, FileTransfer, FileTransferObject, File]
 })
 
 export class HomePage {
-
-  //preguntaSgtePage: PreguntaSgtePage
-  version: any = '3.0.3'
-
+  version: any = '3.1.0'
   timeOutPrimerEncuesta: any = 30000
-  timeOutSincronizar: any = 900000
-  timeOutEncuestaNueva: any = 21600000
-
+  timeOutSincronizar: any = 60000//3600000
+  timeOutEncuestaNueva: any = 60000//3600000
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
-
   consol: any = '';
-
   uuid: String;
   encuesta: any;
   clave: any;
   contadorBtnIzq: any = 0;
   conectado: boolean = true;
-
   aGuardar: any = {
     foto: '',
     fecha: '',
@@ -50,6 +44,12 @@ export class HomePage {
     idEncuesta: '',
     opciones: []
   };
+  //video params
+  urlVideoRemota: any = 'http://192.168.0.54:8080/tapuy/device/verVideo?idencuesta='
+  //urlVideoRemota: any = 'http://tapuy.cloud.runaid.com.ar/device/verVideo?idencuesta='
+  videoOpts: VideoOptions;
+  storageDirectory: string = cordova.file.dataDirectory;
+  idEncuesta: any
 
   //camera params
   picture: string = '';
@@ -68,7 +68,10 @@ export class HomePage {
     public nativeStorage: NativeStorage,
     public camera: CameraPreview,
     private device: Device,
-    private network: Network) {
+    private network: Network,
+    private transfer: FileTransfer,
+    private file: File,
+    public videoPlayer: VideoPlayer) {
     platform.ready().then(() => {
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
@@ -84,13 +87,14 @@ export class HomePage {
       }
       this.uuid = this.device.uuid
       this.getEncuesta()
-      setTimeout(() => {this.sincro()}, this.timeOutSincronizar)
+      setTimeout(() => { this.sincro() }, this.timeOutSincronizar)
+      setTimeout(() => { this.pedirEncuestaNueva() }, this.timeOutEncuestaNueva)
     });
   }
-
+  //----------------------------------------------------------------------------------------
   loguear(log: any) {
-    console.log('----->'+log + ' ' + new Date);
-    //console.log(log)
+    console.log('----->' + log + ' ' + new Date);
+    console.log(log)
     //this.consol = text + ' ' + new Date;
   }
 
@@ -113,17 +117,18 @@ export class HomePage {
     }
   }
 
-  sincro(){
-    setTimeout(() => {this.sincro()}, this.timeOutSincronizar)
-    if(this.conectado){
+  sincro() {
+    this.loguear('Sincronizando')
+    setTimeout(() => { this.sincro() }, this.timeOutSincronizar)
+    if (this.conectado) {
       this.navCtrl.push(SincroPage)
     }
   }
 
   pedirEncuestaNueva() {
-    this.loguear('Pidiendo nueva encuesta')
-    setTimeout(()=>{this.pedirEncuestaNueva()}, this.timeOutEncuestaNueva)
+    setTimeout(() => { this.pedirEncuestaNueva() }, this.timeOutEncuestaNueva)
     if (this.conectado) {
+      this.loguear('Pidiendo encuesta remota')
       this.http.getJsonData()
         .then(res => {
           this.loguear(res)
@@ -264,25 +269,46 @@ export class HomePage {
   /*FIN KIOSK-MODE---------------------------------------------------------*/
 
   /*NATIVE-STORAGE---------------------------------------------------------*/
-  getEncuesta() {//not tocar
+  getEncuesta() {
     return this.nativeStorage.keys()
       .then((response) => {
         return response;
       })
       .then((response2) => {
-        if (response2.length > 0) {
+        if (response2.indexOf('encuesta') > -1) {
+          this.loguear('getItem(encuesta)---------------------')
           this.nativeStorage.getItem('encuesta').then(
             data => {
               this.encuesta = data.json
-              this.preguntaInicial = this.primerPregunta()
-              this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
-              return data;
-            });
+              if (this.encuesta.video) {
+                if (response2.indexOf('videoName') > -1) {
+                  this.nativeStorage.getItem('videoName')
+                    .then(res => {
+                      if (this.encuesta.videoName != res) {
+                        this.borraVideo(res)
+                        this.storage.setNombreVideo(this.encuesta.videoName)
+                        this.downloadVideo(this.encuesta.encuesta)
+                      } else {
+                        this.recuperaVideo()
+                      }
+                    })
+                    .catch(err => { console.error(err) })
+                } else {
+                  this.storage.setNombreVideo(this.encuesta.videoName)
+                  this.downloadVideo(this.encuesta.encuesta)
+                }
+              } else {
+                this.preguntaInicial = this.primerPregunta()
+                this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
+              }
+            })
+            .catch(e => this.loguear(e))
         } else {
           this.pedirPrimerEncuesta();
         }
       });
   }
+
   /*FIN NATIVE-STORAGE-----------------------------------------------------*/
 
   /*CAMERA-----------------------------------------------------------------*/
@@ -299,6 +325,66 @@ export class HomePage {
 
   /*FIN CAMERA-------------------------------------------------------------*/
 
-  
+  /*FILE-TRANSFER----------------------------------------------------------*/
+
+  downloadVideo(idEncuesta) {
+    this.platform.ready().then(() => {
+      const url = this.urlVideoRemota + idEncuesta;
+      const fileTransfer: FileTransferObject = this.transfer.create();
+      fileTransfer.download(url, this.storageDirectory + this.encuesta.videoName)
+        .then(() => {
+          this.loopear(this.storageDirectory + this.encuesta.videoName)
+          //this.playVideo(this.storageDirectory + this.encuesta.videoName)
+        }, (error) => {
+          this.loguear(error)
+        });
+    });
+  }
+
+  recuperaVideo() {
+    this.file.checkFile(this.storageDirectory, this.encuesta.videoName)
+      .then(() => {
+        this.loguear('Lectura exitosa')
+        this.loopear(this.storageDirectory + this.encuesta.videoName)
+      })
+      .catch((err) => {
+        this.loguear('Lectura fallida')
+        this.loguear(err)
+      });
+  }
+
+  borraVideo(videoName) {
+    this.file.removeFile(this.storageDirectory, videoName)
+      .then(() => console.log('Video eliminado con éxito.'))
+      .catch(err => console.error(err))
+  }
+  /*FIN FILE-TRANSFER------------------------------------------------------*/
+
+  /*VIDEO PLAYER-----------------------------------------------------------*/
+  playVideo(path) {
+    this.videoOpts = { volume: 1.0 };
+    return this.videoPlayer.play(path)
+      .then(res => {
+        return res
+      }).catch(err => {
+        this.loguear(err);
+      });
+  }
+
+  loopear(path){
+    if(this.encuesta.video){
+      this.playVideo(path).then(()=>this.loopear(path))
+    }else{
+      this.videoPlayer.close()
+      this.getEncuesta()
+    }
+  }
+
+  public stopPlayingVideo() {
+    this.videoPlayer.close();
+  }
+  /*FIN VIDEO PLAYER------------------------------------------------------*/
+
+
 }
 

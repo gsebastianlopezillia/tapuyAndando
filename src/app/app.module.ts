@@ -10,6 +10,9 @@ import { SQLite } from '@ionic-native/sqlite';
 import { Device } from '@ionic-native/device'
 import { AndroidFullScreen } from '@ionic-native/android-full-screen'
 import { Network } from '@ionic-native/network';
+import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer'
+import { File } from '@ionic-native/file'
+import { VideoPlayer } from '@ionic-native/video-player'
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -53,13 +56,17 @@ import { SincroPage } from '../pages/sincro/sincro'
     SQLite, 
     Device,
     AndroidFullScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
     PvdCameraProvider,
     PvdDeviceProvider,
     PvdHttpProvider,
     PvdStorageProvider,
     PvdSqliteProvider,
-    Network
+    Network,
+    FileTransfer,
+    FileTransferObject,
+    File,
+    VideoPlayer,
+    {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
 export class AppModule {}

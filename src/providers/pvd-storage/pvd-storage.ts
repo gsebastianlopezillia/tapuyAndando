@@ -10,24 +10,57 @@ export class PvdStorageProvider {
 
   setEncuesta(encuesta) {
     return this.nativeStorage
-      .clear()
+      .remove('encuesta')
       .then(data => {
         return this.nativeStorage
           .setItem('encuesta', encuesta)
           .then(
           res => {
-            //console.log('Success pvd-storage setEncuesta() setItem():');
             return res.json;
           },
           err => {
-            //console.error('Fail pvd-storage setEncuesta() setItem():');
-            //console.error(err);
             return err;
           });
       },
       err => {
-        //console.error('Fail pvd-storage setEncuesta() clear():');
-        //console.error(err)
+        return err;
+      });
+  }
+
+  setVideo(video) {
+    return this.nativeStorage
+      .remove('video')
+      .then(data => {
+        return this.nativeStorage
+          .setItem('video', video)
+          .then(
+          res => {
+            return res.json;
+          },
+          err => {
+            return err;
+          });
+      },
+      err => {
+        return err;
+      });
+  }
+
+  setNombreVideo(videoName) {
+    return this.nativeStorage
+      .remove('videoName')
+      .then(data => {
+        return this.nativeStorage
+          .setItem('videoName', videoName)
+          .then(
+          res => {
+            return res.json;
+          },
+          err => {
+            return err;
+          });
+      },
+      err => {
         return err;
       });
   }
