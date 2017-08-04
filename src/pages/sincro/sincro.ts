@@ -21,6 +21,7 @@ import { Network } from '@ionic-native/network'
 export class SincroPage {
 
   conectado: boolean = true;
+  image: any = 'img/imagenencuesta.jpg'
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -40,7 +41,9 @@ export class SincroPage {
       this.loguear('Device sin conexión')
     }
     setTimeout(() => { this.comprobarBase() }, 3000)
-
+    if(this.navParams.get('image') != ''){
+      this.image = this.navParams.get('image')
+    }
   }
 
   loguear(log: any) {

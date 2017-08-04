@@ -13,6 +13,7 @@ import { Network } from '@ionic-native/network';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer'
 import { File } from '@ionic-native/file'
 import { VideoPlayer } from '@ionic-native/video-player'
+//import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -66,6 +67,7 @@ import { SincroPage } from '../pages/sincro/sincro'
     FileTransferObject,
     File,
     VideoPlayer,
+    //AndroidPermissions,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavController, NavParams, Platform } from 'ionic-angular'
+import { NavController, NavParams, Platform, IonicApp } from 'ionic-angular'
 import { Device } from '@ionic-native/device'
 import { NativeStorage } from '@ionic-native/native-storage'
 import { CameraPreview, CameraPreviewPictureOptions } from '@ionic-native/camera-preview'
@@ -12,11 +12,17 @@ import { GraciasPage } from '../gracias/gracias'
 import { PreguntaPage } from '../pregunta/pregunta'
 import { SincroPage } from '../sincro/sincro'
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer'
-import { File } from '@ionic-native/file'//https://github.com/dsgriffin/ionic-3-file-transfer-example
-import { VideoPlayer, VideoOptions, } from '@ionic-native/video-player'//https://www.techiediaries.com/ionic-video-playing/
+import { File } from '@ionic-native/file'
+//https://github.com/dsgriffin/ionic-3-file-transfer-example
+import { VideoPlayer, VideoOptions } from '@ionic-native/video-player'
+//https://www.techiediaries.com/ionic-video-playing/
+//import { AndroidPermissions } from '@ionic-native/android-permissions'
+//https://developer.android.com/reference/android/Manifest.permission.html
+//https://forum.ionicframework.com/t/applying-cordova-plugin-android-permissions-for-ionic-2/78125/6
 
-declare var cordova: any
+declare let cordova: any
 declare let KioskPlugin: any
+
 
 @Component({
   selector: 'page-home',
@@ -25,6 +31,10 @@ declare let KioskPlugin: any
 })
 
 export class HomePage {
+  urlVideoRemota: any = 'http://192.168.0.55:8080/tapuy/device/verVideo?idencuesta='
+  //urlVideoRemota: any = 'http://tapuy.cloud.runaid.com.ar/device/verVideo?idencuesta='
+
+  reproduciendo: boolean = false
   version: any = '3.1.0'
   timeOutPrimerEncuesta: any = 30000
   timeOutSincronizar: any = 60000//3600000
@@ -45,8 +55,7 @@ export class HomePage {
     opciones: []
   };
   //video params
-  urlVideoRemota: any = 'http://192.168.0.54:8080/tapuy/device/verVideo?idencuesta='
-  //urlVideoRemota: any = 'http://tapuy.cloud.runaid.com.ar/device/verVideo?idencuesta='
+
   videoOpts: VideoOptions;
   storageDirectory: string = cordova.file.dataDirectory;
   idEncuesta: any
@@ -71,8 +80,11 @@ export class HomePage {
     private network: Network,
     private transfer: FileTransfer,
     private file: File,
-    public videoPlayer: VideoPlayer) {
+    public videoPlayer: VideoPlayer,
+    private ionicApp: IonicApp) {
     platform.ready().then(() => {
+      //this.permisos().then(res => this.loguear(res))
+      this.inicio()
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
         this.loguear('Desconectado');
@@ -121,7 +133,7 @@ export class HomePage {
     this.loguear('Sincronizando')
     setTimeout(() => { this.sincro() }, this.timeOutSincronizar)
     if (this.conectado) {
-      this.navCtrl.push(SincroPage)
+      this.navCtrl.push(SincroPage, { 'image': this.encuesta.imagenSyncro })
     }
   }
 
@@ -281,15 +293,25 @@ export class HomePage {
             data => {
               this.encuesta = data.json
               if (this.encuesta.video) {
+                this.loguear('ENCUESTA.VIDEO = TRUE')
                 if (response2.indexOf('videoName') > -1) {
                   this.nativeStorage.getItem('videoName')
                     .then(res => {
                       if (this.encuesta.videoName != res) {
+                        this.loguear('VIDEO NUEVO = TRUE')
+                        if (this.reproduciendo) {
+                          this.videoPlayer.close();
+                          this.reproduciendo = false
+                        }
                         this.borraVideo(res)
                         this.storage.setNombreVideo(this.encuesta.videoName)
+                        this.loguear('Baja nuevo video')
                         this.downloadVideo(this.encuesta.encuesta)
                       } else {
-                        this.recuperaVideo()
+                        this.loguear('VIDEO NUEVO = FALSE')
+                        if (!this.reproduciendo) {
+                          this.recuperaVideo()
+                        }
                       }
                     })
                     .catch(err => { console.error(err) })
@@ -298,6 +320,7 @@ export class HomePage {
                   this.downloadVideo(this.encuesta.encuesta)
                 }
               } else {
+                this.loguear('ENCUESTA.VIDEO = FALSE')
                 this.preguntaInicial = this.primerPregunta()
                 this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
               }
@@ -326,13 +349,20 @@ export class HomePage {
   /*FIN CAMERA-------------------------------------------------------------*/
 
   /*FILE-TRANSFER----------------------------------------------------------*/
+  inicio() {
+    this.file.removeFile(this.storageDirectory, 'algo.txt')
+  }
+
 
   downloadVideo(idEncuesta) {
     this.platform.ready().then(() => {
+      this.loguear('Bajando video')
       const url = this.urlVideoRemota + idEncuesta;
       const fileTransfer: FileTransferObject = this.transfer.create();
       fileTransfer.download(url, this.storageDirectory + this.encuesta.videoName)
         .then(() => {
+          this.loguear('Descarga exitosa')
+          this.reproduciendo = true;
           this.loopear(this.storageDirectory + this.encuesta.videoName)
           //this.playVideo(this.storageDirectory + this.encuesta.videoName)
         }, (error) => {
@@ -355,36 +385,41 @@ export class HomePage {
 
   borraVideo(videoName) {
     this.file.removeFile(this.storageDirectory, videoName)
-      .then(() => console.log('Video eliminado con éxito.'))
+      .then(() => console.log('Video eliminado con éxito: ' + videoName))
       .catch(err => console.error(err))
   }
   /*FIN FILE-TRANSFER------------------------------------------------------*/
 
   /*VIDEO PLAYER-----------------------------------------------------------*/
   playVideo(path) {
+    this.reproduciendo = true
     this.videoOpts = { volume: 1.0 };
-    return this.videoPlayer.play(path)
+    return this.videoPlayer.play(path, this.videoOpts)
       .then(res => {
+        this.loguear(res)
         return res
       }).catch(err => {
         this.loguear(err);
       });
   }
 
-  loopear(path){
-    if(this.encuesta.video){
-      this.playVideo(path).then(()=>this.loopear(path))
-    }else{
+  loopear(path) {
+    if (this.encuesta.video) {
+      this.reproduciendo = true
+      this.loguear('Reproduciendo: ' + path)
+      this.playVideo(path).then(() => {
+        this.loguear('Termina video')
+        this.loopear(path)
+      })
+    } else {
       this.videoPlayer.close()
-      this.getEncuesta()
+      this.reproduciendo = false
+      this.preguntaInicial = this.primerPregunta()
+      this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
     }
   }
 
-  public stopPlayingVideo() {
-    this.videoPlayer.close();
-  }
   /*FIN VIDEO PLAYER------------------------------------------------------*/
-
 
 }
 
