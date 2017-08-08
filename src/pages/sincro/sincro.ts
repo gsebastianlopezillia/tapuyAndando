@@ -41,8 +41,12 @@ export class SincroPage {
       this.loguear('Device sin conexión')
     }
     setTimeout(() => { this.comprobarBase() }, 3000)
-    if(this.navParams.get('image') != ''){
+    if (this.navParams.get('image') != '') {
+      console.log('Imagen de encuesta')
+      console.log(this.navParams.get('image'))
       this.image = this.navParams.get('image')
+    } else {
+      console.log('Imagen por default')
     }
   }
 
@@ -60,11 +64,14 @@ export class SincroPage {
     this.sqlite.count()
       .then(res => {
         if (res == 0) {
-          this.navCtrl.popToRoot()
-            .then()
-            .catch(e => {
-              //this.loguear(e)
-            })
+          setTimeout(() => {
+            this.navCtrl.popToRoot()
+              .then()
+              .catch(e => {
+                //this.loguear(e)
+              })
+          }, 5000)
+
         } else {
           this.mandar()
         }
@@ -78,11 +85,13 @@ export class SincroPage {
           this.comprobarBase()
         })
     } else {
-      this.navCtrl.popToRoot()
-        .then()
-        .catch(e => {
-          //this.loguear(e)
-        })
+      setTimeout(() => {
+        this.navCtrl.popToRoot()
+          .then()
+          .catch(e => {
+            //this.loguear(e)
+          })
+      }, 5000)
     }
   }
 

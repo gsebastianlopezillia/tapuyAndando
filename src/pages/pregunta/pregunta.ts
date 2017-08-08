@@ -55,10 +55,6 @@ export class PreguntaPage {
     //this.consol = text + ' ' + new Date;
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad PreguntaPage');
-  }
-
   preguntaSgte(opcion) {
     this.aGuardar.opciones.push(opcion.id)
     if (opcion.preguntasiguiente != null) {

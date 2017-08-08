@@ -82,7 +82,6 @@
     </platform>
     <engine name="android" spec="^6.2.3" />
     <plugin name="com.moust.cordova.videoplayer" spec="https://github.com/gsebastianlopezillia/cordova-plugin-video-player2.git" />
-    <plugin name="cordova-custom-config" spec="^4.0.2" />
     <plugin name="cordova-plugin-camera-preview" spec="^0.9.0" />
     <plugin name="cordova-plugin-console" spec="^1.0.7" />
     <plugin name="cordova-plugin-device" spec="^1.1.6" />

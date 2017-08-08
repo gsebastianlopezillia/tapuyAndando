@@ -130,9 +130,10 @@ export class HomePage {
   }
 
   sincro() {
-    this.loguear('Sincronizando')
     setTimeout(() => { this.sincro() }, this.timeOutSincronizar)
     if (this.conectado) {
+      this.loguear('Sincronizando')
+      this.loguear(this.encuesta)
       this.navCtrl.push(SincroPage, { 'image': this.encuesta.imagenSyncro })
     }
   }
@@ -393,7 +394,7 @@ export class HomePage {
   /*VIDEO PLAYER-----------------------------------------------------------*/
   playVideo(path) {
     this.reproduciendo = true
-    this.videoOpts = { volume: 1.0 };
+    this.videoOpts = { volume: 0 };
     return this.videoPlayer.play(path, this.videoOpts)
       .then(res => {
         this.loguear(res)
