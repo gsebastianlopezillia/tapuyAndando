@@ -27,6 +27,7 @@ import { PvdSqliteProvider } from '../providers/pvd-sqlite/pvd-sqlite';
 import { GraciasPage } from '../pages/gracias/gracias'
 import { PreguntaPage } from '../pages/pregunta/pregunta'
 import { SincroPage } from '../pages/sincro/sincro'
+import { VideoPage } from '../pages/video/video'
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { SincroPage } from '../pages/sincro/sincro'
     HomePage,
     GraciasPage,
     PreguntaPage,
-    SincroPage
+    SincroPage,
+    VideoPage
   ],
   imports: [
     BrowserModule,
@@ -47,7 +49,8 @@ import { SincroPage } from '../pages/sincro/sincro'
     HomePage,
     GraciasPage,
     PreguntaPage,
-    SincroPage
+    SincroPage,
+    VideoPage
   ],
   providers: [
     StatusBar,

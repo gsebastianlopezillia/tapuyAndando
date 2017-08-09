@@ -11,14 +11,10 @@ import { NgModel } from '@angular/forms'
 import { GraciasPage } from '../gracias/gracias'
 import { PreguntaPage } from '../pregunta/pregunta'
 import { SincroPage } from '../sincro/sincro'
+import { VideoPage } from '../video/video'
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer'
 import { File } from '@ionic-native/file'
 //https://github.com/dsgriffin/ionic-3-file-transfer-example
-import { VideoPlayer, VideoOptions } from '@ionic-native/video-player'
-//https://www.techiediaries.com/ionic-video-playing/
-//import { AndroidPermissions } from '@ionic-native/android-permissions'
-//https://developer.android.com/reference/android/Manifest.permission.html
-//https://forum.ionicframework.com/t/applying-cordova-plugin-android-permissions-for-ionic-2/78125/6
 
 declare let cordova: any
 declare let KioskPlugin: any
@@ -34,11 +30,10 @@ export class HomePage {
   urlVideoRemota: any = 'http://192.168.0.55:8080/tapuy/device/verVideo?idencuesta='
   //urlVideoRemota: any = 'http://tapuy.cloud.runaid.com.ar/device/verVideo?idencuesta='
 
-  reproduciendo: boolean = false
   version: any = '3.1.0'
   timeOutPrimerEncuesta: any = 30000
-  timeOutSincronizar: any = 60000//3600000
-  timeOutEncuestaNueva: any = 60000//3600000
+  timeOutSincronizar: any = 120000//3600000
+  timeOutEncuestaNueva: any = 120000//3600000
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
   consol: any = '';
@@ -56,7 +51,6 @@ export class HomePage {
   };
   //video params
 
-  videoOpts: VideoOptions;
   storageDirectory: string = cordova.file.dataDirectory;
   idEncuesta: any
 
@@ -80,10 +74,8 @@ export class HomePage {
     private network: Network,
     private transfer: FileTransfer,
     private file: File,
-    public videoPlayer: VideoPlayer,
     private ionicApp: IonicApp) {
     platform.ready().then(() => {
-      //this.permisos().then(res => this.loguear(res))
       this.inicio()
       let disconnectSub = this.network.onDisconnect().subscribe(() => {
         this.conectado = false;
@@ -103,6 +95,11 @@ export class HomePage {
       setTimeout(() => { this.pedirEncuestaNueva() }, this.timeOutEncuestaNueva)
     });
   }
+
+  ionViewWillEnter() {
+    this.loopear()
+  }
+
   //----------------------------------------------------------------------------------------
   loguear(log: any) {
     console.log('----->' + log + ' ' + new Date);
@@ -116,7 +113,6 @@ export class HomePage {
       this.loguear('pedirPrimerEncuesta()')
       this.http.getJsonData()
         .then(res => {
-          this.loguear(res)
           this.getEncuesta()
         })
         .catch(e => {
@@ -294,24 +290,19 @@ export class HomePage {
               this.encuesta = data.json
               if (this.encuesta.video) {
                 this.loguear('ENCUESTA.VIDEO = TRUE')
+                this.encuesta.videoName = this.encuesta.videoName.substring(this.encuesta.videoName.lastIndexOf('\\') + 1, this.encuesta.videoName.length)
                 if (response2.indexOf('videoName') > -1) {
                   this.nativeStorage.getItem('videoName')
                     .then(res => {
                       if (this.encuesta.videoName != res) {
                         this.loguear('VIDEO NUEVO = TRUE')
-                        if (this.reproduciendo) {
-                          this.videoPlayer.close();
-                          this.reproduciendo = false
-                        }
                         this.borraVideo(res)
                         this.storage.setNombreVideo(this.encuesta.videoName)
                         this.loguear('Baja nuevo video')
                         this.downloadVideo(this.encuesta.encuesta)
                       } else {
                         this.loguear('VIDEO NUEVO = FALSE')
-                        if (!this.reproduciendo) {
-                          this.recuperaVideo()
-                        }
+                        this.recuperaVideo()
                       }
                     })
                     .catch(err => { console.error(err) })
@@ -351,8 +342,9 @@ export class HomePage {
   /*FILE-TRANSFER----------------------------------------------------------*/
   inicio() {
     this.file.removeFile(this.storageDirectory, 'algo.txt')
+      .then(() => { this.loguear('jamas') },
+      err => { this.loguear(err) })
   }
-
 
   downloadVideo(idEncuesta) {
     this.platform.ready().then(() => {
@@ -362,9 +354,7 @@ export class HomePage {
       fileTransfer.download(url, this.storageDirectory + this.encuesta.videoName)
         .then(() => {
           this.loguear('Descarga exitosa')
-          this.reproduciendo = true;
-          this.loopear(this.storageDirectory + this.encuesta.videoName)
-          //this.playVideo(this.storageDirectory + this.encuesta.videoName)
+          this.loopear()
         }, (error) => {
           this.loguear(error)
         });
@@ -375,7 +365,7 @@ export class HomePage {
     this.file.checkFile(this.storageDirectory, this.encuesta.videoName)
       .then(() => {
         this.loguear('Lectura exitosa')
-        this.loopear(this.storageDirectory + this.encuesta.videoName)
+        this.loopear()
       })
       .catch((err) => {
         this.loguear('Lectura fallida')
@@ -391,32 +381,20 @@ export class HomePage {
   /*FIN FILE-TRANSFER------------------------------------------------------*/
 
   /*VIDEO PLAYER-----------------------------------------------------------*/
-  playVideo(path) {
-    this.reproduciendo = true
-    this.videoOpts = { volume: 0 };
-    return this.videoPlayer.play(path, this.videoOpts)
-      .then(res => {
-        this.loguear(res)
-        return res
-      }).catch(err => {
-        this.loguear(err);
-      });
+  goToVideo() {
+    let path = this.storageDirectory + this.encuesta.videoName
+    this.navCtrl.push(VideoPage, { 'video': path, 'uuid': this.uuid })
   }
 
-  loopear(path) {
-    if (this.encuesta.video) {
-      this.reproduciendo = true
-      this.loguear('Reproduciendo: ' + path)
-      this.playVideo(path).then(() => {
-        this.loguear('Termina video')
-        this.loopear(path)
-      })
-    } else {
-      this.videoPlayer.close()
-      this.reproduciendo = false
-      this.preguntaInicial = this.primerPregunta()
-      this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
-    }
+  loopear() {
+    //if (this.navCtrl.getActive().name == 'HomePage' || this.navCtrl.getActive().name == 'SincroPage') {
+      if (this.encuesta.video) {
+        this.goToVideo()
+      } else {
+        this.preguntaInicial = this.primerPregunta()
+        this.opcionesIniciales = this.opcionesPregunta(this.preguntaInicial)
+      }
+    //}
   }
 
   /*FIN VIDEO PLAYER------------------------------------------------------*/

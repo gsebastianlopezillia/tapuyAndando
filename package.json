@@ -33,7 +33,6 @@
         "@ionic-native/splash-screen": "3.10.2",
         "@ionic-native/sqlite": "^3.14.0",
         "@ionic-native/status-bar": "3.10.2",
-        "@ionic-native/video-player": "^4.1.0",
         "@ionic/storage": "2.0.1",
         "cordova-android": "^6.2.3",
         "cordova-plugin-camera-preview": "^0.9.0",
@@ -48,8 +47,6 @@
         "cordova-plugin-splashscreen": "^4.0.3",
         "cordova-plugin-sqlite": "^1.0.3",
         "cordova-plugin-statusbar": "^2.2.2",
-        "cordova-plugin-video-player": "git+https://github.com/moust/cordova-plugin-videoplayer.git",
-        "cordova-plugin-video-player2": "git+https://github.com/gsebastianlopezillia/cordova-plugin-video-player2.git",
         "cordova-plugin-whitelist": "^1.3.1",
         "cordova-sqlite-storage": "^2.0.4",
         "device": "^0.3.8",
@@ -58,8 +55,7 @@
         "ionicons": "3.0.0",
         "rxjs": "5.4.0",
         "sw-toolbox": "3.6.0",
-        "zone.js": "0.8.12",
-        "com.moust.cordova.videoplayer": "https://github.com/gsebastianlopezillia/cordova-plugin-video-player2.git"
+        "zone.js": "0.8.12"
     },
     "devDependencies": {
         "@ionic/app-scripts": "1.3.7",
@@ -86,8 +82,7 @@
             "cordova-plugin-device": {},
             "cordova-plugin-file-transfer": {},
             "cordova-plugin-file": {},
-            "cordova-plugin-kiosk": {},
-            "com.moust.cordova.videoplayer": {}
+            "cordova-plugin-kiosk": {}
         },
         "platforms": [
             "android"
