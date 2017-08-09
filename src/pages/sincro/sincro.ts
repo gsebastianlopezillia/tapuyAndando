@@ -42,16 +42,15 @@ export class SincroPage {
     }
     setTimeout(() => { this.comprobarBase() }, 3000)
     if (this.navParams.get('image') != '') {
-      console.log('Imagen de encuesta')
-      console.log(this.navParams.get('image'))
+     this.loguear('Imagen de encuesta')
       this.image = this.navParams.get('image')
     } else {
-      console.log('Imagen por default')
+      this.loguear('Imagen por default')
     }
   }
 
   loguear(log: any) {
-    console.log(log + ' ' + new Date);
+    console.log('----->' + log + ' ' + new Date);
     console.log(log)
     //this.consol = text + ' ' + new Date;
   }

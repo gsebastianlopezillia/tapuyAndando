@@ -133,8 +133,7 @@ export class HomePage {
     setTimeout(() => { this.sincro() }, this.timeOutSincronizar)
     if (this.conectado) {
       this.loguear('Sincronizando')
-      this.loguear(this.encuesta)
-      this.navCtrl.push(SincroPage, { 'image': this.encuesta.imagenSyncro })
+      this.navCtrl.push(SincroPage, { 'image': this.encuesta.imagenSincro })
     }
   }
 
