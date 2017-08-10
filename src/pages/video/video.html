@@ -4,12 +4,14 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-<button id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> . </button>
-<div id="invisible" hidden="true">
-    <ion-item>
-        <ion-label>Id: {{uuid}}</ion-label><br/>
-        <ion-input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
-        <button id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">Desbloquear</button>
-    </ion-item>
+<div id="btnIzquierdo">
+    <button color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
+    <div id="invisible" hidden="true">
+        <ion-item>
+            <ion-label>Id: {{uuid}}</ion-label><br/>
+            <ion-input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
+            <button id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">Desbloquear</button>
+        </ion-item>
+    </div>
 </div>
 <video id="video2" width="100%" heigth="100%" autoplay="autoplay" muted="muted" (ended)="popear()"></video>

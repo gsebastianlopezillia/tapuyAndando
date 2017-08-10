@@ -41,8 +41,8 @@ export class SincroPage {
       this.loguear('Device sin conexión')
     }
     setTimeout(() => { this.comprobarBase() }, 3000)
-    if (this.navParams.get('image') != '') {
-     this.loguear('Imagen de encuesta')
+    if (this.navParams.get('image') != '' && this.navParams.get('image') != undefined) {
+      this.loguear('Imagen de encuesta')
       this.image = this.navParams.get('image')
     } else {
       this.loguear('Imagen por default')
@@ -52,25 +52,21 @@ export class SincroPage {
   loguear(log: any) {
     console.log('----->' + log + ' ' + new Date);
     console.log(log)
-    //this.consol = text + ' ' + new Date;
   }
 
   ionViewDidLoad() {
-    setTimeout(() => { this.comprobarBase }, 3000)
+    this.comprobarBase()
   }
 
   comprobarBase() {
     this.sqlite.count()
       .then(res => {
         if (res == 0) {
-          setTimeout(() => {
-            this.navCtrl.popToRoot()
-              .then()
-              .catch(e => {
-                //this.loguear(e)
-              })
-          }, 5000)
-
+          this.navCtrl.popToRoot()
+            .then()
+            .catch(e => {
+              //this.loguear(e)
+            })
         } else {
           this.mandar()
         }
@@ -84,13 +80,10 @@ export class SincroPage {
           this.comprobarBase()
         })
     } else {
-      setTimeout(() => {
-        this.navCtrl.popToRoot()
-          .then()
-          .catch(e => {
-            //this.loguear(e)
-          })
-      }, 5000)
+      this.navCtrl.popToRoot()
+        .then()
+        .catch(e => {
+        })
     }
   }
 

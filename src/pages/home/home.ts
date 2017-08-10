@@ -30,7 +30,7 @@ export class HomePage {
   urlVideoRemota: any = 'http://192.168.0.55:8080/tapuy/device/verVideo?idencuesta='
   //urlVideoRemota: any = 'http://tapuy.cloud.runaid.com.ar/device/verVideo?idencuesta='
 
-  version: any = '3.1.0'
+  version: any = '3.2.0'
   timeOutPrimerEncuesta: any = 30000
   timeOutSincronizar: any = 120000//3600000
   timeOutEncuestaNueva: any = 120000//3600000
