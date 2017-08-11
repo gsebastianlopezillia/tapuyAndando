@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
@@ -14,6 +14,7 @@ declare let KioskPlugin: any
   templateUrl: 'video.html',
 })
 export class VideoPage {
+  @ViewChild('input') myInput ;
   uuid: any
   video: any
   clave: any
@@ -22,20 +23,22 @@ export class VideoPage {
   constructor(public navCtrl: NavController, public navParams: NavParams) {
     this.video = this.navParams.get('video')
     this.uuid = this.navParams.get('uuid')
+
   }
 
   play() {
-    let myVideo = document.getElementById('video2');
+    let myVideo = document.getElementById('video');
     myVideo.setAttribute('src', this.video)
   }
 
-  popear(){
+  popear() {
     console.log('popeando')
     this.navCtrl.popToRoot()
   }
 
   ionViewDidLoad() {
-     this.play()
+    this.hideClave()
+    this.play()
   }
 
   /*KIOSK-MODE-------------------------------------------------------------*/
@@ -60,13 +63,21 @@ export class VideoPage {
 
   showClave() {
     let divClave = document.getElementById('invisible')
-    divClave.removeAttribute("hidden")
+    divClave.style.zIndex = '30'
+    divClave.removeAttribute('hidden')
+    let videoTag = document.getElementById('video')
+    videoTag.removeAttribute('class')
+    videoTag.setAttribute('class', 'abajo')
     setTimeout(() => { this.hideClave(); }, 25000)
+    this.myInput.setFocus();
   }
 
   hideClave() {
     let divClave = document.getElementById('invisible');
     divClave.setAttribute("hidden", "true");
+    let videoTag = document.getElementById('video')
+    videoTag.removeAttribute('class')
+    videoTag.setAttribute('class', 'centro')
     this.clave = '';
     this.contadorBtnIzq = 0;
   }

@@ -4,14 +4,15 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-<div id="btnIzquierdo">
-    <button color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
-    <div id="invisible" hidden="true">
+<ion-content text-center class="Absolute-Center" style="background-color: black;">
+    <button id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()">    </button>
+    <button id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">      </button>
+    <div id="invisible">
         <ion-item>
             <ion-label>Id: {{uuid}}</ion-label><br/>
-            <ion-input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
-            <button id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">Desbloquear</button>
+            <ion-input #input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
+
         </ion-item>
     </div>
-</div>
-<video id="video2" width="100%" heigth="100%" autoplay="autoplay" muted="muted" (ended)="popear()"></video>
+    <video id="video" width="100%" heigth="100%" autoplay="autoplay" muted="muted" (ended)="popear()" (abort)="popear()" class="centro"></video>
+</ion-content>

@@ -25,6 +25,7 @@
     <preference name="loadUrlTimeoutValue" value="700000" />
     <preference name="AndroidPersistentFileLocation" value="Compatibility" />
     <preference name="fullscreen" value="true" />
+    <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <platform name="android">
         <allow-intent href="market:*" />
         <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
