@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, Input, ViewChild } from '@angular/core'
 import { NavController, NavParams, Platform, IonicApp } from 'ionic-angular'
 import { Device } from '@ionic-native/device'
 import { NativeStorage } from '@ionic-native/native-storage'
@@ -27,13 +27,14 @@ declare let KioskPlugin: any
 })
 
 export class HomePage {
+  @ViewChild('input') myInput;
   urlVideoRemota: any = 'http://192.168.0.55:8080/tapuy/device/verVideo?idencuesta='
   //urlVideoRemota: any = 'http://tapuy.cloud.runaid.com.ar/device/verVideo?idencuesta='
 
-  version: any = '3.2.0'
+  version: any = '3.3.0'
   timeOutPrimerEncuesta: any = 30000
-  timeOutSincronizar: any = 120000//3600000
-  timeOutEncuestaNueva: any = 120000//3600000
+  timeOutSincronizar: any = 54000000//3600000
+  timeOutEncuestaNueva: any = 54000000//3600000
   preguntaInicial: any = '';
   opcionesIniciales: any = [];
   consol: any = '';
@@ -250,6 +251,7 @@ export class HomePage {
 
   confirmaClave() {
     if (this.contadorBtnIzq == 3) {
+      this.contadorBtnIzq = 0
       this.showClave();
     }
   }
@@ -258,13 +260,13 @@ export class HomePage {
     let divClave = document.getElementById('invisibe');
     divClave.removeAttribute("hidden");
     setTimeout(() => { this.hideClave(); }, 25000);
+    this.myInput.setFocus();
   }
 
   hideClave() {
     let divClave = document.getElementById('invisibe');
     divClave.setAttribute("hidden", "true");
     this.clave = '';
-    this.contadorBtnIzq = 0;
   }
 
   desbloquear() {
@@ -383,7 +385,7 @@ export class HomePage {
   /*VIDEO PLAYER-----------------------------------------------------------*/
   goToVideo() {
     let path = this.storageDirectory + this.encuesta.videoName
-    this.navCtrl.push(VideoPage, { 'video': path, 'uuid': this.uuid })
+    this.navCtrl.push(VideoPage, { 'video': path, 'uuid': this.uuid, 'version': this.version })
   }
 
   loopear() {

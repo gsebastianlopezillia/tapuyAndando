@@ -30,7 +30,20 @@ page-video {
         display: block;
     }
     #btnIzquierdo {
-        float: left;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 100px;
+        height: 100px;
+        z-index: 30;
+    }
+    #btnClave {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 100px;
+        height: 100px;
+        z-index: 2020;
     }
     .abajo {
         position: absolute;

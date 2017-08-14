@@ -19,11 +19,12 @@ export class VideoPage {
   video: any
   clave: any
   contadorBtnIzq: any = 0
+  version: any
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
     this.video = this.navParams.get('video')
     this.uuid = this.navParams.get('uuid')
-
+    this.version = this.navParams.get('version')
   }
 
   play() {

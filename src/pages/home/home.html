@@ -6,21 +6,14 @@
     </ion-navbar>
 </ion-header>
 <ion-content padding text-center class="Absolute-Center">
-    <div id="botonera" text-right>
-        <button id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()"> * </button>
-    </div>
-    <!--
-    <div id="botonera" text-right>
-        <button id="btnIzquierdo" color="light" ion-button clear large item-left (click)="pedirEncuestaNueva()"> Sincro </button>
-    </div>
-    -->
+    <button id="btnIzquierdo" color="light" ion-button clear large item-left (click)="clickBtnIzquierdo()">    </button>
+    <button id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">      </button>
     <div id="invisibe" hidden="true">
         <ion-item>
             <button id="btnDerecho" item-right ion-button clear small (click)="pedirEncuestaNueva()">Cargar</button>
             <ion-label>Id: {{uuid}}</ion-label><br/>
             <ion-label>Versión: {{version}}</ion-label>
-            <ion-input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
-            <button id="btnClave" color="assertive" ion-button clear small item-right (click)="desbloquear()">Desbloquear</button>
+            <ion-input #input type="password" id="clave" (input)="setClave($event.target.value)" [value]="clave" ([ngModel])="clave"></ion-input>
         </ion-item>
     </div>
     <br/>
